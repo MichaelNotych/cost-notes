@@ -1,0 +1,11 @@
+.DS_store
+
+/backend/node_modules
+/backend/.DS_store
+/backend/logs
+/backend/access.log
+/backend/.env
+
+/frontend/node_modules
+/frontend/.DS_store
+/frontend/.env
