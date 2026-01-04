@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 app.use(
 	cors({
 		origin: config.clientUrl,
-		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+		methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 		allowedHeaders: ["Content-Type", "Authorization"],
 	})
 );
