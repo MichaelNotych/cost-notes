@@ -13,4 +13,5 @@ module.exports = {
 	jwtSecret: envVars.JWT_SECRET,
 	googleApiKey: envVars.GOOGLE_API_KEY,
 	exchangeRateApiKey: envVars.EXCHANGE_RATE_API_KEY,
+	clientUrl: envVars.CLIENT_URL,
 };

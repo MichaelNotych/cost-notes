@@ -7,6 +7,7 @@ const envVarsSchema = joi.object({
 	JWT_SECRET: joi.string().required(),
 	GOOGLE_API_KEY: joi.string().required(),
 	EXCHANGE_RATE_API_KEY: joi.string().required(),
+	CLIENT_URL: joi.string().required(),
 }).unknown();
 
 module.exports = envVarsSchema;
