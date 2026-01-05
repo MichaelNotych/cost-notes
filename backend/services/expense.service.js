@@ -75,12 +75,25 @@ const addExpense = async (expense, userId) => {
 };
 
 const getExpenses = async (userId) => {
-    const expenses = await Expense.find({ userId }).populate("category").sort({ createdAt: -1 });
+    const expenses = await Expense.find({ userId })
+        .populate("category")
+        .sort({ createdAt: -1 });
     return expenses;
 };
 
 const editExpense = async (expenseId, expense) => {
-    const updatedExpense = await Expense.findByIdAndUpdate(expenseId, expense, { new: true });
+    const currentExpense = await Expense.findById(expenseId);
+    if (currentExpense.amount !== expense.amount) {
+        const convertedAmount = await rateService.convertAmount(
+            expense.amount,
+            expense.currency
+        );
+        expense.defaultCurrencyAmount = convertedAmount;
+        await currentExpense.save();
+    }
+    const updatedExpense = await Expense.findByIdAndUpdate(expenseId, expense, {
+        new: true,
+    });
     return updatedExpense;
 };
 
@@ -109,4 +122,10 @@ const addManualExpense = async (expenseData, userId) => {
     return Expense.findById(expense._id).populate("category");
 };
 
-module.exports = { addExpense, getExpenses, editExpense, deleteExpense, addManualExpense };
+module.exports = {
+    addExpense,
+    getExpenses,
+    editExpense,
+    deleteExpense,
+    addManualExpense,
+};
