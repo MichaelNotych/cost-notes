@@ -93,7 +93,7 @@ const editExpense = async (expenseId, expense) => {
     }
     const updatedExpense = await Expense.findByIdAndUpdate(expenseId, expense, {
         new: true,
-    });
+    }).populate("category");
     return updatedExpense;
 };
 
