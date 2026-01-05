@@ -22,7 +22,7 @@ axiosIns.interceptors.response.use(
 			router.push({ name: 'AuthView' })
 		}
 		return Promise.reject(error)
-	}
+	},
 )
 
 export default axiosIns

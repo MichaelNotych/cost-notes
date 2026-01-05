@@ -89,4 +89,24 @@ const deleteExpense = async (expenseId) => {
     return deletedExpense;
 };
 
-module.exports = { addExpense, getExpenses, editExpense, deleteExpense };
+const addManualExpense = async (expenseData, userId) => {
+    const { title, amount, currency, category, createdAt } = expenseData;
+
+    const convertedAmount = await rateService.convertAmount(amount, currency);
+
+    const expense = await Expense.create({
+        title,
+        amount,
+        currency,
+        category,
+        userDescription: title,
+        userId,
+        defaultCurrencyAmount: convertedAmount,
+        defaultCurrency: "USD",
+        createdAt: createdAt,
+    });
+
+    return Expense.findById(expense._id).populate("category");
+};
+
+module.exports = { addExpense, getExpenses, editExpense, deleteExpense, addManualExpense };

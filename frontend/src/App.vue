@@ -4,7 +4,9 @@
 	<header class="container">
 		<nav>
 			<ul>
-				<li><RouterLink to="/"><strong>Cost Notes</strong></RouterLink></li>
+				<li>
+					<RouterLink to="/"><strong>Cost Notes</strong></RouterLink>
+				</li>
 			</ul>
 			<ul>
 				<li><RouterLink to="/categories">Categories</RouterLink></li>

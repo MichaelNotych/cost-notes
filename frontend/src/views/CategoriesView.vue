@@ -89,73 +89,82 @@ const onDeleteCategory = async (categoryId) => {
 </script>
 
 <template>
-		<h2>Categories</h2>
+	<h2>Categories</h2>
 
-		<!-- Existing Categories -->
-		<article v-for="category in categoriesStore.categories" :key="category._id" class="category-item">
+	<!-- Existing Categories -->
+	<article
+		v-for="category in categoriesStore.categories"
+		:key="category._id"
+		class="category-item"
+	>
+		<div class="category-inputs">
+			<input
+				v-if="categoryForms[category._id]"
+				type="text"
+				name="category-emoji"
+				placeholder="Emoji"
+				v-model="categoryForms[category._id].emoji"
+				:aria-invalid="categoryForms[category._id].errors.emoji ? 'true' : undefined"
+				class="emoji-input"
+			/>
+			<small v-if="categoryForms[category._id]?.errors.emoji" class="error">
+				{{ categoryForms[category._id].errors.emoji }}
+			</small>
+
+			<input
+				v-if="categoryForms[category._id]"
+				type="text"
+				name="category-name"
+				placeholder="Category name"
+				v-model="categoryForms[category._id].name"
+				:aria-invalid="categoryForms[category._id].errors.name ? 'true' : undefined"
+				class="name-input"
+			/>
+			<small v-if="categoryForms[category._id]?.errors.name" class="error">
+				{{ categoryForms[category._id].errors.name }}
+			</small>
+		</div>
+
+		<div class="category-actions">
+			<button @click="onUpdateCategory(category._id)" class="save-btn">Save</button>
+			<button @click="onDeleteCategory(category._id)" class="delete-btn secondary">
+				Delete
+			</button>
+		</div>
+	</article>
+
+	<!-- Add New Category -->
+	<article class="new-category">
+		<h3>Add New Category</h3>
+		<form @submit.prevent="onAddCategory">
 			<div class="category-inputs">
 				<input
-					v-if="categoryForms[category._id]"
 					type="text"
+					name="new-category-emoji"
 					placeholder="Emoji"
-					v-model="categoryForms[category._id].emoji"
-					:aria-invalid="categoryForms[category._id].errors.emoji ? 'true' : undefined"
+					v-model="newEmoji"
+					:aria-invalid="newEmojiError ? 'true' : undefined"
 					class="emoji-input"
 				/>
-				<small v-if="categoryForms[category._id]?.errors.emoji" class="error">
-					{{ categoryForms[category._id].errors.emoji }}
-				</small>
+				<small v-if="newEmojiError" class="error">{{ newEmojiError }}</small>
 
 				<input
-					v-if="categoryForms[category._id]"
 					type="text"
+					name="new-category-name"
 					placeholder="Category name"
-					v-model="categoryForms[category._id].name"
-					:aria-invalid="categoryForms[category._id].errors.name ? 'true' : undefined"
+					v-model="newName"
+					:aria-invalid="newNameError ? 'true' : undefined"
 					class="name-input"
 				/>
-				<small v-if="categoryForms[category._id]?.errors.name" class="error">
-					{{ categoryForms[category._id].errors.name }}
-				</small>
+				<small v-if="newNameError" class="error">{{ newNameError }}</small>
 			</div>
 
-			<div class="category-actions">
-				<button @click="onUpdateCategory(category._id)" class="save-btn">Save</button>
-				<button @click="onDeleteCategory(category._id)" class="delete-btn secondary">Delete</button>
-			</div>
-		</article>
-
-		<!-- Add New Category -->
-		<article class="new-category">
-			<h3>Add New Category</h3>
-			<form @submit.prevent="onAddCategory">
-				<div class="category-inputs">
-					<input
-						type="text"
-						placeholder="Emoji"
-						v-model="newEmoji"
-						:aria-invalid="newEmojiError ? 'true' : undefined"
-						class="emoji-input"
-					/>
-					<small v-if="newEmojiError" class="error">{{ newEmojiError }}</small>
-
-					<input
-						type="text"
-						placeholder="Category name"
-						v-model="newName"
-						:aria-invalid="newNameError ? 'true' : undefined"
-						class="name-input"
-					/>
-					<small v-if="newNameError" class="error">{{ newNameError }}</small>
-				</div>
-
-				<button type="submit" class="add-btn">Add Category</button>
-			</form>
-		</article>
+			<button type="submit" class="add-btn">Add Category</button>
+		</form>
+	</article>
 </template>
 
 <style scoped>
-
 .category-item,
 .new-category {
 	margin-bottom: 1rem;

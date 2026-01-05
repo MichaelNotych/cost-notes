@@ -14,7 +14,18 @@ const editExpenseSchema = {
   }),
 };
 
+const addManualExpenseSchema = {
+  body: Joi.object().keys({
+    title: Joi.string().required(),
+    amount: Joi.number().required(),
+    currency: Joi.string().required(),
+    category: Joi.string().required(),
+    createdAt: Joi.date().optional(),
+  }),
+};
+
 module.exports = {
   addExpenseSchema,
   editExpenseSchema,
+  addManualExpenseSchema,
 };

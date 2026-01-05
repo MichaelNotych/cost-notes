@@ -23,4 +23,9 @@ const getExpenses = catchAsync(async (req, res) => {
     res.status(status.OK).json(expenses);
 });
 
-module.exports = { addExpense, editExpense, deleteExpense, getExpenses };
+const addManualExpense = catchAsync(async (req, res) => {
+    const expense = await expenseService.addManualExpense(req.body, req.userId);
+    res.status(status.CREATED).json(expense);
+});
+
+module.exports = { addExpense, editExpense, deleteExpense, getExpenses, addManualExpense };

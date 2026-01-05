@@ -31,4 +31,11 @@ router.get(
   expenseController.getExpenses
 );
 
+router.post(
+  "/manual-expense",
+  auth,
+  validate(expenseValidation.addManualExpenseSchema),
+  expenseController.addManualExpense
+);
+
 module.exports = router;

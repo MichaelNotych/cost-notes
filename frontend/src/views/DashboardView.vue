@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
+import ManualExpenseDialog from '@/components/ManualExpenseDialog.vue'
 
 const expensesStore = useExpensesStore()
 
@@ -12,6 +13,7 @@ onMounted(() => {
 
 const expense = ref('')
 const editDialog = ref(null)
+const manualDialog = ref(null)
 
 const handleSubmit = () => {
 	expensesStore.addExpense(expense.value)
@@ -20,6 +22,10 @@ const handleSubmit = () => {
 
 const handleEdit = (expense) => {
 	editDialog.value.open(expense)
+}
+
+const handleAddManual = (date) => {
+	manualDialog.value.open(date)
 }
 
 const handleSave = async ({ id, data }) => {
@@ -39,9 +45,11 @@ const handleSave = async ({ id, data }) => {
 			:date="group.date"
 			:expenses="group.items"
 			@edit-expense="handleEdit"
+			@add-manual-expense="handleAddManual"
 		/>
 
 		<EditExpenseDialog ref="editDialog" @save="handleSave" />
+		<ManualExpenseDialog ref="manualDialog" />
 
 		<article v-if="expensesStore.groupedExpenses.length === 0">
 			<header>No Data</header>
@@ -60,6 +68,7 @@ const handleSave = async ({ id, data }) => {
 .expenses {
 	height: 100%;
 	overflow-y: auto;
+	padding-bottom: 6rem;
 }
 
 .form {

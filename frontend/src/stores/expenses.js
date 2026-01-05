@@ -27,6 +27,7 @@ export const useExpensesStore = defineStore('expenses', {
 					weekday: 'short',
 					month: 'short',
 					day: 'numeric',
+					year: 'numeric',
 				})
 
 				if (!currentGroup || currentGroup.date !== date) {
@@ -70,6 +71,23 @@ export const useExpensesStore = defineStore('expenses', {
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add expense'
+				throw err
+			}
+		},
+
+		/**
+		 * Create a new manual expense
+		 * @param {Object} expenseData
+		 */
+		async addManualExpense(expenseData) {
+			this.error = null
+			try {
+				const response = await axiosIns.post('/manual-expense', expenseData)
+				this.expenses.push(response.data)
+				return response.data
+			} catch (err) {
+				console.error(err)
+				this.error = err.response?.data?.message || 'Failed to add manual expense'
 				throw err
 			}
 		},

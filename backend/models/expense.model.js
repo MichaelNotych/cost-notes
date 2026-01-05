@@ -36,8 +36,12 @@ const expenseSchema = Schema(
             type: String,
             required: false,
         },
+        createdAt: {
+            type: Date,
+            required: true,
+            default: Date.now,
+        },
     },
-    { timestamps: true }
 );
 
 const Expense = model("Expense", expenseSchema);

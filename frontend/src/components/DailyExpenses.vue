@@ -28,8 +28,15 @@ const defaultCurrency = computed(() => {
 
 <template>
 	<article>
-		<header>
+		<header style="display: flex; justify-content: space-between; align-items: center">
 			<strong>{{ date }}</strong>
+			<button
+				class="outline contrast"
+				style="padding: 0.25rem; line-height: 1"
+				@click="$emit('add-manual-expense', date)"
+			>
+				+
+			</button>
 		</header>
 		<ul style="padding: 0; list-style: none; margin-bottom: 0">
 			<li
