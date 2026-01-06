@@ -94,7 +94,6 @@ const onSubmit = handleSubmit(async (values) => {
 					type="submit"
 					variant="primary"
 					class="w-full"
-					:loading="true"
 				>
 					{{ isNewUser ? 'Sign up' : 'Sign in' }}
 				</AppButton>
