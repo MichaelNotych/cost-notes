@@ -15,9 +15,13 @@ const expense = ref('')
 const editDialog = ref(null)
 const manualDialog = ref(null)
 
-const handleSubmit = () => {
-	expensesStore.addExpense(expense.value)
-	expense.value = ''
+const handleSubmit = async () => {
+	try {
+		await expensesStore.addExpense(expense.value)
+		expense.value = ''
+	} catch (err) {
+		console.error('Failed to add expense:', err)
+	}
 }
 
 const handleEdit = (expense) => {
@@ -39,7 +43,13 @@ const handleSave = async ({ id, data }) => {
 
 <template>
 	<div class="expenses">
+		<div
+			class="expenses__loader"
+			v-if="expensesStore.isLoadingExpenses"
+			:aria-busy="true"
+		></div>
 		<DailyExpenses
+			v-else
 			v-for="group in expensesStore.groupedExpenses"
 			:key="group.date"
 			:date="group.date"
@@ -58,8 +68,21 @@ const handleSave = async ({ id, data }) => {
 	</div>
 	<form class="form" @submit.prevent="handleSubmit">
 		<fieldset role="group">
-			<input name="expense" type="text" placeholder="Enter your expense" v-model="expense" />
-			<input type="submit" value="Add" />
+			<input
+				name="expense"
+				type="text"
+				placeholder="Enter your expense"
+				autocomplete="off"
+				v-model="expense"
+			/>
+			<button
+				type="submit"
+				value="Add"
+				:aria-busy="expensesStore.isAddingExpense"
+				:disabled="expensesStore.isAddingExpense"
+			>
+				Add
+			</button>
 		</fieldset>
 	</form>
 </template>
@@ -67,8 +90,19 @@ const handleSave = async ({ id, data }) => {
 <style>
 .expenses {
 	height: 100%;
+	flex: 1;
 	overflow-y: auto;
 	padding-bottom: 6rem;
+	display: flex;
+	flex-direction: column;
+}
+
+.expenses__loader {
+	flex: 1;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .form {
@@ -77,5 +111,6 @@ const handleSave = async ({ id, data }) => {
 	left: 0;
 	right: 0;
 	padding: 1rem;
+	background-color: var(--pico-background-color);
 }
 </style>

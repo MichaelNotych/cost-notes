@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-	<header class="container">
+	<header>
 		<nav>
 			<ul>
 				<li>
@@ -13,9 +13,16 @@
 			</ul>
 		</nav>
 	</header>
-	<main class="container">
+	<main>
 		<RouterView />
 	</main>
 </template>
 
-<style scoped></style>
+<style scoped>
+	main {
+		flex: 1;
+
+		display: flex;
+		flex-direction: column;
+	}
+</style>

@@ -5,6 +5,8 @@ export const useExpensesStore = defineStore('expenses', {
 	state: () => ({
 		expenses: [],
 		error: null,
+		isAddingExpense: false,
+		isLoadingExpenses: false
 	}),
 
 	getters: {
@@ -47,12 +49,15 @@ export const useExpensesStore = defineStore('expenses', {
 		 */
 		async fetchExpenses() {
 			this.error = null
+			this.isLoadingExpenses = true
 			try {
 				const response = await axiosIns.get('/expenses')
 				this.expenses = response.data
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to fetch expenses'
+			} finally {
+				this.isLoadingExpenses = false
 			}
 		},
 
@@ -62,6 +67,7 @@ export const useExpensesStore = defineStore('expenses', {
 		 */
 		async addExpense(expenseData) {
 			this.error = null
+			this.isAddingExpense = true
 			try {
 				const response = await axiosIns.post('/expense', {
 					userDescription: expenseData,
@@ -72,6 +78,8 @@ export const useExpensesStore = defineStore('expenses', {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add expense'
 				throw err
+			} finally {
+				this.isAddingExpense = false
 			}
 		},
 
@@ -81,6 +89,7 @@ export const useExpensesStore = defineStore('expenses', {
 		 */
 		async addManualExpense(expenseData) {
 			this.error = null
+			this.isAddingExpense = true
 			try {
 				const response = await axiosIns.post('/manual-expense', expenseData)
 				this.expenses.push(response.data)
@@ -89,6 +98,8 @@ export const useExpensesStore = defineStore('expenses', {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add manual expense'
 				throw err
+			} finally {
+				this.isAddingExpense = false
 			}
 		},
 
