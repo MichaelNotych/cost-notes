@@ -16,8 +16,8 @@ const requestRates = async () => {
 
 const getLatestRates = async () => {
     const rate = await Rate.findOne().sort({ createdAt: -1 });
-    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
-    if (!rate || rate.createdAt < threeDaysAgo) {
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    if (!rate || rate.createdAt < weekAgo) {
         return requestRates();
     }
     return rate;
