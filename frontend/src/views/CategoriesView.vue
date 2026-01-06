@@ -4,6 +4,7 @@ import { useCategoriesStore } from '@/stores/categories'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
+import AppButton from '@/components/AppButton.vue'
 
 const categoriesStore = useCategoriesStore()
 
@@ -89,118 +90,111 @@ const onDeleteCategory = async (categoryId) => {
 </script>
 
 <template>
-	<h2>Categories</h2>
+	<div class="space-y-8">
+		<h2 class="text-2xl font-bold text-[#c9d1d9] mb-6">Categories</h2>
 
-	<!-- Existing Categories -->
-	<article
-		v-for="category in categoriesStore.categories"
-		:key="category._id"
-		class="category-item"
-	>
-		<div class="category-inputs">
-			<input
-				v-if="categoryForms[category._id]"
-				type="text"
-				name="category-emoji"
-				placeholder="Emoji"
-				v-model="categoryForms[category._id].emoji"
-				:aria-invalid="categoryForms[category._id].errors.emoji ? 'true' : undefined"
-				class="emoji-input"
-			/>
-			<small v-if="categoryForms[category._id]?.errors.emoji" class="error">
-				{{ categoryForms[category._id].errors.emoji }}
-			</small>
+		<!-- Existing Categories -->
+		<div class="space-y-4">
+			<div
+				v-for="category in categoriesStore.categories"
+				:key="category._id"
+				class="bg-[#161b22] rounded-xl p-4 border border-gray-700 shadow-lg"
+			>
+				<div class="grid grid-cols-[80px_1fr] gap-4 mb-4">
+					<div class="relative">
+						<input
+							v-if="categoryForms[category._id]"
+							type="text"
+							placeholder="Emoji"
+							v-model="categoryForms[category._id].emoji"
+							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 text-center focus:ring-1 focus:ring-sky-600 outline-none"
+						/>
+						<small
+							v-if="categoryForms[category._id]?.errors.emoji"
+							class="text-red-500 text-xs absolute -bottom-5 left-0"
+						>
+							{{ categoryForms[category._id].errors.emoji }}
+						</small>
+					</div>
 
-			<input
-				v-if="categoryForms[category._id]"
-				type="text"
-				name="category-name"
-				placeholder="Category name"
-				v-model="categoryForms[category._id].name"
-				:aria-invalid="categoryForms[category._id].errors.name ? 'true' : undefined"
-				class="name-input"
-			/>
-			<small v-if="categoryForms[category._id]?.errors.name" class="error">
-				{{ categoryForms[category._id].errors.name }}
-			</small>
-		</div>
+					<div class="relative">
+						<input
+							v-if="categoryForms[category._id]"
+							type="text"
+							placeholder="Category name"
+							v-model="categoryForms[category._id].name"
+							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none"
+						/>
+						<small
+							v-if="categoryForms[category._id]?.errors.name"
+							class="text-red-500 text-xs absolute -bottom-5 left-0"
+						>
+							{{ categoryForms[category._id].errors.name }}
+						</small>
+					</div>
+				</div>
 
-		<div class="category-actions">
-			<button @click="onUpdateCategory(category._id)" class="save-btn">Save</button>
-			<button @click="onDeleteCategory(category._id)" class="delete-btn secondary">
-				Delete
-			</button>
-		</div>
-	</article>
-
-	<!-- Add New Category -->
-	<article class="new-category">
-		<h3>Add New Category</h3>
-		<form @submit.prevent="onAddCategory">
-			<div class="category-inputs">
-				<input
-					type="text"
-					name="new-category-emoji"
-					placeholder="Emoji"
-					v-model="newEmoji"
-					:aria-invalid="newEmojiError ? 'true' : undefined"
-					class="emoji-input"
-				/>
-				<small v-if="newEmojiError" class="error">{{ newEmojiError }}</small>
-
-				<input
-					type="text"
-					name="new-category-name"
-					placeholder="Category name"
-					v-model="newName"
-					:aria-invalid="newNameError ? 'true' : undefined"
-					class="name-input"
-				/>
-				<small v-if="newNameError" class="error">{{ newNameError }}</small>
+				<div class="flex gap-3">
+					<AppButton
+						variant="danger"
+						size="sm"
+						class="flex-1"
+						@click="onDeleteCategory(category._id)"
+					>
+						Delete
+					</AppButton>
+					<AppButton
+						variant="secondary"
+						size="sm"
+						class="flex-1"
+						@click="onUpdateCategory(category._id)"
+					>
+						Save
+					</AppButton>
+				</div>
 			</div>
+		</div>
 
-			<button type="submit" class="add-btn">Add Category</button>
-		</form>
-	</article>
+		<!-- Add New Category -->
+		<div class="bg-[#161b22] rounded-xl p-6 border border-gray-700 shadow-xl mt-8">
+			<h3 class="text-lg font-bold text-[#c9d1d9] mb-4">Add New Category</h3>
+			<form @submit.prevent="onAddCategory" class="space-y-6">
+				<div class="grid grid-cols-[80px_1fr] gap-4">
+					<div class="relative">
+						<input
+							type="text"
+							placeholder="Emoji"
+							v-model="newEmoji"
+							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 text-center focus:ring-1 focus:ring-sky-600 outline-none"
+						/>
+						<small v-if="newEmojiError" class="text-red-500 text-xs absolute -bottom-5 left-0">
+							{{ newEmojiError }}
+						</small>
+					</div>
+
+					<div class="relative">
+						<input
+							type="text"
+							placeholder="Category name"
+							v-model="newName"
+							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none"
+						/>
+						<small v-if="newNameError" class="text-red-500 text-xs absolute -bottom-5 left-0">
+							{{ newNameError }}
+						</small>
+					</div>
+				</div>
+
+				<AppButton
+					type="submit"
+					variant="primary"
+					class="w-full"
+				>
+					Add Category
+				</AppButton>
+			</form>
+		</div>
+	</div>
 </template>
 
-<style scoped>
-.category-item,
-.new-category {
-	margin-bottom: 1rem;
-}
-
-.category-inputs {
-	display: grid;
-	grid-template-columns: 80px 1fr;
-	gap: 0.5rem;
-	margin-bottom: 0.5rem;
-}
-
-.emoji-input {
-	grid-column: 1;
-	text-align: center;
-	font-size: 1.5rem;
-}
-
-.name-input {
-	grid-column: 2;
-}
-
-.error {
-	grid-column: span 2;
-	color: var(--pico-del-color);
-	margin-top: -0.5rem;
-}
-
-.category-actions {
-	display: flex;
-	gap: 0.5rem;
-}
-
-.save-btn,
-.delete-btn,
-.add-btn {
-	flex: 1;
-}
-</style>
+<style scoped></style>

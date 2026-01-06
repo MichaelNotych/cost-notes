@@ -4,6 +4,7 @@ import { useExpensesStore } from '@/stores/expenses'
 import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
 import ManualExpenseDialog from '@/components/ManualExpenseDialog.vue'
+import AppButton from '@/components/AppButton.vue'
 
 const expensesStore = useExpensesStore()
 
@@ -42,75 +43,76 @@ const handleSave = async ({ id, data }) => {
 </script>
 
 <template>
-	<div class="expenses">
-		<div
-			class="expenses__loader"
-			v-if="expensesStore.isLoadingExpenses"
-			:aria-busy="true"
-		></div>
-		<DailyExpenses
-			v-else
-			v-for="group in expensesStore.groupedExpenses"
-			:key="group.date"
-			:date="group.date"
-			:expenses="group.items"
-			@edit-expense="handleEdit"
-			@add-manual-expense="handleAddManual"
-		/>
+	<div class="flex flex-col flex-1 relative min-h-0">
+		<div class="flex-1 overflow-y-auto pb-24 scrollbar-hide">
+			<div
+				class="flex justify-center items-center py-8"
+				v-if="expensesStore.isLoadingExpenses"
+			>
+				<div
+					class="w-8 h-8 border-4 border-sky-600 border-t-transparent rounded-full animate-spin"
+				></div>
+			</div>
+
+			<template v-else>
+				<DailyExpenses
+					v-for="group in expensesStore.groupedExpenses"
+					:key="group.date"
+					:date="group.date"
+					:expenses="group.items"
+					@edit-expense="handleEdit"
+					@add-manual-expense="handleAddManual"
+				/>
+
+				<div
+					v-if="expensesStore.groupedExpenses.length === 0"
+					class="bg-[#161b22] rounded-xl p-8 text-center border border-gray-700"
+				>
+					<h3 class="text-[#c9d1d9] font-bold mb-2">No Data</h3>
+					<p class="text-[#8b949e]">No expenses recorded yet.</p>
+				</div>
+			</template>
+		</div>
 
 		<EditExpenseDialog ref="editDialog" @save="handleSave" />
 		<ManualExpenseDialog ref="manualDialog" />
 
-		<article v-if="expensesStore.groupedExpenses.length === 0">
-			<header>No Data</header>
-			No expenses recorded yet.
-		</article>
+		<div class="fixed bottom-0 left-0 right-0 p-4 bg-gray-950/80 backdrop-blur-md z-10">
+			<div class="max-w-2xl mx-auto">
+				<form
+					@submit.prevent="handleSubmit"
+					class="flex gap-0 overflow-hidden rounded-xl border border-gray-700 bg-[#161b22]"
+				>
+					<input
+						name="expense"
+						type="text"
+						placeholder="Enter your expense"
+						autocomplete="off"
+						v-model="expense"
+						class="flex-1 bg-transparent border-none py-3 px-4 text-[#c9d1d9] placeholder-[#484f58] focus:ring-0 outline-none"
+					/>
+					<AppButton
+						type="submit"
+						variant="primary"
+						rounded="none"
+						:loading="expensesStore.isAddingExpense"
+						:disabled="!expense.trim()"
+						class="min-w-[100px]"
+					>
+						Add
+					</AppButton>
+				</form>
+			</div>
+		</div>
 	</div>
-	<form class="form" @submit.prevent="handleSubmit">
-		<fieldset role="group">
-			<input
-				name="expense"
-				type="text"
-				placeholder="Enter your expense"
-				autocomplete="off"
-				v-model="expense"
-			/>
-			<button
-				type="submit"
-				value="Add"
-				:aria-busy="expensesStore.isAddingExpense"
-				:disabled="expensesStore.isAddingExpense"
-			>
-				Add
-			</button>
-		</fieldset>
-	</form>
 </template>
 
-<style>
-.expenses {
-	height: 100%;
-	flex: 1;
-	overflow-y: auto;
-	padding-bottom: 6rem;
-	display: flex;
-	flex-direction: column;
+<style scoped>
+.scrollbar-hide::-webkit-scrollbar {
+	display: none;
 }
-
-.expenses__loader {
-	flex: 1;
-
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.form {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: 1rem;
-	background-color: var(--pico-background-color);
+.scrollbar-hide {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
 }
 </style>
