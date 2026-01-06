@@ -32,10 +32,28 @@ const defaultCurrency = computed(() => {
 			<strong>{{ date }}</strong>
 			<button
 				class="outline contrast"
-				style="padding: 0.25rem; line-height: 1"
+				style="
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					height: 1.5rem;
+					width: 1.5rem;
+					padding: 0;
+				"
 				@click="$emit('add-manual-expense', date)"
 			>
-				+
+				<svg
+					width="9"
+					height="9"
+					viewBox="0 0 9 9"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M3.41974 8.84659V0H5.42685V8.84659H3.41974ZM0 5.42685V3.41974H8.84659V5.42685H0Z"
+						fill="white"
+					/>
+				</svg>
 			</button>
 		</header>
 		<ul style="padding: 0; list-style: none; margin-bottom: 0">
