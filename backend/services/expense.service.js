@@ -83,7 +83,10 @@ const getExpenses = async (userId) => {
 
 const editExpense = async (expenseId, expense) => {
     const currentExpense = await Expense.findById(expenseId);
-    if (currentExpense.amount !== expense.amount) {
+    if (
+        currentExpense.amount !== expense.amount ||
+        currentExpense.currency !== expense.currency
+    ) {
         const convertedAmount = await rateService.convertAmount(
             expense.amount,
             expense.currency
