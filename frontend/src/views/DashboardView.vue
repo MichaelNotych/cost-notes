@@ -68,8 +68,8 @@ const handleSave = async ({ id, data }) => {
 					v-if="expensesStore.groupedExpenses.length === 0"
 					class="bg-[#161b22] rounded-xl p-8 text-center border border-gray-700"
 				>
-					<h3 class="text-[#c9d1d9] font-bold mb-2">No Data</h3>
-					<p class="text-[#8b949e]">No expenses recorded yet.</p>
+					<h3 class="font-bold mb-2">No Data</h3>
+					<p>No expenses recorded yet.</p>
 				</div>
 			</template>
 		</div>
@@ -77,11 +77,11 @@ const handleSave = async ({ id, data }) => {
 		<EditExpenseDialog ref="editDialog" @save="handleSave" />
 		<ManualExpenseDialog ref="manualDialog" />
 
-		<div class="fixed bottom-0 left-0 right-0 p-4 bg-gray-950/80 backdrop-blur-md z-10">
+		<div class="fixed bottom-0 left-0 right-0 p-4 bg-gray-950 z-10">
 			<div class="max-w-2xl mx-auto">
 				<form
 					@submit.prevent="handleSubmit"
-					class="flex gap-0 overflow-hidden rounded-xl border border-gray-700 bg-[#161b22]"
+					class="flex gap-0 overflow-hidden rounded-xl border border-gray-700"
 				>
 					<input
 						name="expense"
@@ -89,7 +89,7 @@ const handleSave = async ({ id, data }) => {
 						placeholder="Enter your expense"
 						autocomplete="off"
 						v-model="expense"
-						class="flex-1 bg-transparent border-none py-3 px-4 text-[#c9d1d9] placeholder-[#484f58] focus:ring-0 outline-none"
+						class="flex-1 bg-transparent border-none py-3 px-4 text-gray-100 placeholder-gray-600 focus:ring-0 outline-none"
 					/>
 					<AppButton
 						type="submit"

@@ -22,7 +22,7 @@
 
 <style>
 body {
-	background-color: var(--color-gray-900);
+	background-color: var(--color-gray-950);
 	color: var(--color-gray-100);
 	margin: 0;
 	padding: 0;

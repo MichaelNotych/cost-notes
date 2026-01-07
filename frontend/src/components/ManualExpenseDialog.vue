@@ -83,10 +83,10 @@ defineExpose({ open })
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-gray-700">
-					<h3 class="text-[#c9d1d9] font-bold text-lg">Add Expense for {{ selectedDate }}</h3>
+					<h3 class="text-gray-400 font-bold text-lg">Add Expense for {{ selectedDate }}</h3>
 					<button
 						@click="close"
-						class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+						class="text-[#8b949e] hover:text-gray-400 transition-colors"
 						aria-label="Close"
 					>
 						<svg
@@ -112,7 +112,7 @@ defineExpose({ open })
 							v-model="title"
 							type="text"
 							placeholder="e.g. Coffee"
-							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none"
+							class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
 							:class="{ 'border-red-500': errors.title }"
 						/>
 						<small v-if="errors.title" class="text-red-500 text-xs">{{ errors.title }}</small>
@@ -126,7 +126,7 @@ defineExpose({ open })
 								type="number"
 								step="0.01"
 								placeholder="0.00"
-								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none"
+								class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
 								:class="{ 'border-red-500': errors.amount }"
 							/>
 							<small v-if="errors.amount" class="text-red-500 text-xs">{{ errors.amount }}</small>
@@ -136,7 +136,7 @@ defineExpose({ open })
 							<label class="text-xs font-semibold text-[#8b949e] uppercase">Currency</label>
 							<select
 								v-model="currency"
-								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
+								class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
 								:class="{ 'border-red-500': errors.currency }"
 							>
 								<option v-for="c in currencies" :key="c" :value="c">{{ c }}</option>
@@ -151,7 +151,7 @@ defineExpose({ open })
 						<label class="text-xs font-semibold text-[#8b949e] uppercase">Category</label>
 						<select
 							v-model="category"
-							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
+							class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
 							:class="{ 'border-red-500': errors.category }"
 						>
 							<option

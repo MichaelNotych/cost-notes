@@ -74,10 +74,10 @@ defineExpose({
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-gray-700">
-					<h3 class="text-[#c9d1d9] font-bold text-lg">Edit Expense</h3>
+					<h3 class="text-gray-400 font-bold text-lg">Edit Expense</h3>
 					<button
 						@click="close"
-						class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+						class="text-[#8b949e] hover:text-gray-400 transition-colors"
 						aria-label="Close"
 					>
 						<svg
@@ -102,7 +102,7 @@ defineExpose({
 						<select
 							v-model="editedExpense.category"
 							required
-							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
+							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
 						>
 							<option
 								v-for="cat in categoriesStore.categories"
@@ -121,7 +121,7 @@ defineExpose({
 							type="text"
 							placeholder="Expense title"
 							required
-							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none"
+							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
 						/>
 					</div>
 
@@ -134,7 +134,7 @@ defineExpose({
 								step="0.01"
 								placeholder="0.00"
 								required
-								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none"
+								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
 							/>
 						</div>
 						<div class="space-y-1">
@@ -144,7 +144,7 @@ defineExpose({
 								type="text"
 								placeholder="USD"
 								required
-								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-[#c9d1d9] focus:ring-1 focus:ring-sky-600 outline-none uppercase"
+								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none uppercase"
 							/>
 						</div>
 					</div>

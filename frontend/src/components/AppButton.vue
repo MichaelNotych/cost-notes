@@ -32,10 +32,10 @@ const props = defineProps({
 
 const variantClasses = {
 	primary: 'bg-sky-600 hover:bg-sky-700 text-white border-transparent',
-	secondary: 'bg-[#21262d] hover:bg-gray-700 text-[#c9d1d9] border-gray-700',
+	secondary: 'bg-[#21262d] hover:bg-gray-700 text-gray-400 border-gray-700',
 	danger: 'bg-[#da363326] hover:bg-[#da36334d] text-[#f85149] border-[#f851494d]',
 	ghost: 'bg-transparent text-sky-600 hover:underline border-transparent p-0 inline',
-	outline: 'bg-transparent border-gray-700 text-[#c9d1d9] hover:bg-sky-600/10 hover:text-sky-600 hover:border-sky-600',
+	outline: 'bg-transparent border-gray-700 text-gray-400 hover:bg-sky-600/10 hover:text-sky-600 hover:border-sky-600',
 }
 
 const sizeClasses = {
