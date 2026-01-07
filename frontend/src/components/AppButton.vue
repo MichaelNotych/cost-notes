@@ -32,8 +32,8 @@ const props = defineProps({
 
 const variantClasses = {
 	primary: 'bg-sky-600 hover:bg-sky-700 text-white border-transparent',
-	secondary: 'bg-[#21262d] hover:bg-gray-700 text-gray-100 border-gray-700',
-	danger: 'bg-[#da363326] hover:bg-[#da36334d] text-[#f85149] border-[#f851494d]',
+	secondary: 'bg-gray-500/20 hover:bg-gray-500/40 text-gray-100 border-gray-500/20',
+	danger: 'bg-red-500/20 hover:bg-red-500/40 text-red-500 border-red-500/20',
 	ghost: 'bg-transparent text-sky-600 hover:underline border-transparent p-0 inline',
 	outline:
 		'bg-transparent border-gray-700 text-gray-100 hover:bg-sky-600/10 hover:text-sky-600 hover:border-sky-600',
@@ -47,10 +47,10 @@ const sizeClasses = {
 
 const classes = computed(() => {
 	const base =
-		'font-bold transition-all border outline-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
+		'font-medium transition-all border outline-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
 
 	if (props.variant === 'ghost') {
-		return 'text-sky-600 font-semibold hover:underline bg-transparent border-none p-0 inline cursor-pointer'
+		return 'text-sky-600 font-medium hover:underline bg-transparent border-none p-0 inline cursor-pointer'
 	}
 
 	const roundedClass = props.rounded === 'none' ? '' : `rounded-${props.rounded}`

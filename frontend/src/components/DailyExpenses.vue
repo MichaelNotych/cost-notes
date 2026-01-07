@@ -69,7 +69,7 @@ const defaultCurrency = computed(() => {
 					</div>
 					<div class="font-medium flex items-baseline gap-1">
 						<span>{{ expense.amount }}</span>
-						<span class="text-xs text-[#8b949e]">
+						<span class="text-xs text-gray-400">
 							{{ getCurrencySymbolFromCode(expense.currency) }}
 						</span>
 					</div>
@@ -79,10 +79,10 @@ const defaultCurrency = computed(() => {
 		<footer
 			class="flex justify-between items-center p-4 bg-gray-950/50 border-t border-gray-700"
 		>
-			<span class="text-[#8b949e] font-semibold">Total:</span>
+			<span class="text-gray-400 font-semibold">Total:</span>
 			<span class="font-bold text-lg">
 				{{ dailyTotal.toFixed(2) }}
-				<span class="text-sm font-medium text-[#8b949e]">
+				<span class="text-sm font-medium text-gray-400">
 					{{ getCurrencySymbolFromCode(defaultCurrency) }}
 				</span>
 			</span>

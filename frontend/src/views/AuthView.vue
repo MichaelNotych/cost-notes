@@ -72,7 +72,7 @@ const onSubmit = handleSubmit(async (values) => {
 				</div>
 
 				<div class="space-y-2">
-					<label class="text-sm font-semibold text-[#8b949e] uppercase ml-1"
+					<label class="text-sm font-semibold text-gray-400 uppercase ml-1"
 						>Password</label
 					>
 					<input

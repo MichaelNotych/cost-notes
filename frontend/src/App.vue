@@ -1,35 +1,21 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
 import AppButton from './components/AppButton.vue'
 
 const authStore = useAuthStore()
-const router = useRouter()
-
-const logout = () => {
-	authStore.logout()
-	router.push('/auth')
-}
 </script>
 
 <template>
 	<div class="px-4 py-6 max-w-2xl mx-auto w-full">
-		<header class="flex justify-between items-center mb-8">
-			<RouterLink to="/" class="text-sky-600 font-bold text-lg">CN</RouterLink>
+		<header class="flex justify-center items-center mb-8">
 			<nav>
 				<ul class="flex items-center gap-6">
 					<template v-if="authStore.isAuthenticated">
 						<li>
-							<RouterLink
-								to="/categories"
-								class="text-sm transition-colors hover:text-sky-600"
-								>Categories</RouterLink
-							>
+							<RouterLink to="/"> Home </RouterLink>
 						</li>
 						<li>
-							<AppButton @click="logout" variant="secondary" size="sm">
-								Logout
-							</AppButton>
+							<RouterLink to="/categories"> Categories </RouterLink>
 						</li>
 					</template>
 					<template v-else>

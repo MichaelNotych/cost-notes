@@ -70,14 +70,14 @@ defineExpose({
 			@click="close"
 		>
 			<div
-				class="bg-[#161b22] w-full max-w-md rounded-2xl border border-gray-700 shadow-2xl overflow-hidden"
+				class="bg-gray-900 w-full max-w-md rounded-2xl border border-gray-700 shadow-2xl overflow-hidden"
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-gray-700">
 					<h3 class="text-gray-400 font-bold text-lg">Edit Expense</h3>
 					<button
 						@click="close"
-						class="text-[#8b949e] hover:text-gray-400 transition-colors"
+						class="text-gray-400 hover:text-gray-400 transition-colors"
 						aria-label="Close"
 					>
 						<svg
@@ -98,7 +98,7 @@ defineExpose({
 
 				<form @submit.prevent="save" class="p-6 space-y-4">
 					<div class="space-y-1">
-						<label class="text-xs font-semibold text-[#8b949e] uppercase"
+						<label class="text-xs font-semibold text-gray-400 uppercase"
 							>Category</label
 						>
 						<select
@@ -117,7 +117,7 @@ defineExpose({
 					</div>
 
 					<div class="space-y-1">
-						<label class="text-xs font-semibold text-[#8b949e] uppercase"
+						<label class="text-xs font-semibold text-gray-400 uppercase"
 							>Description</label
 						>
 						<input
@@ -131,7 +131,7 @@ defineExpose({
 
 					<div class="grid grid-cols-2 gap-4">
 						<div class="space-y-1">
-							<label class="text-xs font-semibold text-[#8b949e] uppercase"
+							<label class="text-xs font-semibold text-gray-400 uppercase"
 								>Amount</label
 							>
 							<input
@@ -144,7 +144,7 @@ defineExpose({
 							/>
 						</div>
 						<div class="space-y-1">
-							<label class="text-xs font-semibold text-[#8b949e] uppercase"
+							<label class="text-xs font-semibold text-gray-400 uppercase"
 								>Currency</label
 							>
 							<input
