@@ -22,7 +22,8 @@
 
 <style>
 body {
-	@apply bg-gray-950 text-gray-100;
+	background-color: var(--color-gray-900);
+	color: var(--color-gray-100);
 	margin: 0;
 	padding: 0;
 }
