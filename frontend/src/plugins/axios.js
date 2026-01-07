@@ -1,6 +1,8 @@
 import axios from 'axios'
 import router from '../router'
 
+import { useAuthStore } from '@/stores/auth'
+
 const API_URL = import.meta.env.VITE_API_URL
 const axiosIns = axios.create({
 	baseURL: API_URL,
@@ -18,7 +20,8 @@ axiosIns.interceptors.response.use(
 	(response) => response,
 	(error) => {
 		if (error.response && error.response.status === 401) {
-			localStorage.removeItem('cn_token')
+			const authStore = useAuthStore()
+			authStore.logout()
 			router.push({ name: 'AuthView' })
 		}
 		return Promise.reject(error)

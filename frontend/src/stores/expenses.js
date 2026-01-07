@@ -6,7 +6,7 @@ export const useExpensesStore = defineStore('expenses', {
 		expenses: [],
 		error: null,
 		isAddingExpense: false,
-		isLoadingExpenses: false
+		isLoadingExpenses: false,
 	}),
 
 	getters: {

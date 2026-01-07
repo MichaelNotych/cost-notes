@@ -98,7 +98,9 @@ defineExpose({
 
 				<form @submit.prevent="save" class="p-6 space-y-4">
 					<div class="space-y-1">
-						<label class="text-xs font-semibold text-[#8b949e] uppercase">Category</label>
+						<label class="text-xs font-semibold text-[#8b949e] uppercase"
+							>Category</label
+						>
 						<select
 							v-model="editedExpense.category"
 							required
@@ -115,7 +117,9 @@ defineExpose({
 					</div>
 
 					<div class="space-y-1">
-						<label class="text-xs font-semibold text-[#8b949e] uppercase">Description</label>
+						<label class="text-xs font-semibold text-[#8b949e] uppercase"
+							>Description</label
+						>
 						<input
 							v-model="editedExpense.title"
 							type="text"
@@ -127,7 +131,9 @@ defineExpose({
 
 					<div class="grid grid-cols-2 gap-4">
 						<div class="space-y-1">
-							<label class="text-xs font-semibold text-[#8b949e] uppercase">Amount</label>
+							<label class="text-xs font-semibold text-[#8b949e] uppercase"
+								>Amount</label
+							>
 							<input
 								v-model="editedExpense.amount"
 								type="number"
@@ -138,7 +144,9 @@ defineExpose({
 							/>
 						</div>
 						<div class="space-y-1">
-							<label class="text-xs font-semibold text-[#8b949e] uppercase">Currency</label>
+							<label class="text-xs font-semibold text-[#8b949e] uppercase"
+								>Currency</label
+							>
 							<input
 								v-model="editedExpense.currency"
 								type="text"
@@ -150,18 +158,10 @@ defineExpose({
 					</div>
 
 					<div class="pt-4 flex gap-3">
-						<AppButton
-							variant="secondary"
-							class="flex-1"
-							@click="close"
-						>
+						<AppButton variant="secondary" class="flex-1" @click="close">
 							Cancel
 						</AppButton>
-						<AppButton
-							type="submit"
-							variant="primary"
-							class="flex-1"
-						>
+						<AppButton type="submit" variant="primary" class="flex-1">
 							Save Changes
 						</AppButton>
 					</div>

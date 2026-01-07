@@ -6,7 +6,9 @@ import * as z from 'zod'
 import { useRouter } from 'vue-router'
 import axiosIns from '@/plugins/axios'
 import AppButton from '@/components/AppButton.vue'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const router = useRouter()
 const isNewUser = ref(false)
 
@@ -37,9 +39,7 @@ const onSubmit = handleSubmit(async (values) => {
 			throw new Error(data.message || 'Authentication failed')
 		}
 
-		// specific logic for storing token
-		localStorage.setItem('cn_token', data.token)
-		localStorage.setItem('cn_user', JSON.stringify(data.user))
+		authStore.setUser(data.user, data.token)
 
 		router.push('/')
 	} catch (error) {
@@ -90,32 +90,20 @@ const onSubmit = handleSubmit(async (values) => {
 					</p>
 				</div>
 
-				<AppButton
-					type="submit"
-					variant="primary"
-					class="w-full"
-				>
+				<AppButton type="submit" variant="primary" class="w-full">
 					{{ isNewUser ? 'Sign up' : 'Sign in' }}
 				</AppButton>
 
 				<div class="text-center text-gray-400">
 					<small v-if="isNewUser">
 						Already have an account?
-						<AppButton
-							variant="ghost"
-							@click="isNewUser = false"
-							class="ml-1"
-						>
+						<AppButton variant="ghost" @click="isNewUser = false" class="ml-1">
 							Sign in
 						</AppButton>
 					</small>
 					<small v-else>
 						Don't have an account?
-						<AppButton
-							variant="ghost"
-							@click="isNewUser = true"
-							class="ml-1"
-						>
+						<AppButton variant="ghost" @click="isNewUser = true" class="ml-1">
 							Sign up
 						</AppButton>
 					</small>

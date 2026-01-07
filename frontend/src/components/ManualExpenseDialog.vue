@@ -83,7 +83,9 @@ defineExpose({ open })
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-gray-700">
-					<h3 class="text-gray-400 font-bold text-lg">Add Expense for {{ selectedDate }}</h3>
+					<h3 class="text-gray-400 font-bold text-lg">
+						Add Expense for {{ selectedDate }}
+					</h3>
 					<button
 						@click="close"
 						class="text-[#8b949e] hover:text-gray-400 transition-colors"
@@ -115,12 +117,16 @@ defineExpose({ open })
 							class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
 							:class="{ 'border-red-500': errors.title }"
 						/>
-						<small v-if="errors.title" class="text-red-500 text-xs">{{ errors.title }}</small>
+						<small v-if="errors.title" class="text-red-500 text-xs">{{
+							errors.title
+						}}</small>
 					</div>
 
 					<div class="grid grid-cols-2 gap-4">
 						<div class="space-y-1">
-							<label class="text-xs font-semibold text-[#8b949e] uppercase">Amount</label>
+							<label class="text-xs font-semibold text-[#8b949e] uppercase"
+								>Amount</label
+							>
 							<input
 								v-model.number="amount"
 								type="number"
@@ -129,11 +135,15 @@ defineExpose({ open })
 								class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
 								:class="{ 'border-red-500': errors.amount }"
 							/>
-							<small v-if="errors.amount" class="text-red-500 text-xs">{{ errors.amount }}</small>
+							<small v-if="errors.amount" class="text-red-500 text-xs">{{
+								errors.amount
+							}}</small>
 						</div>
 
 						<div class="space-y-1">
-							<label class="text-xs font-semibold text-[#8b949e] uppercase">Currency</label>
+							<label class="text-xs font-semibold text-[#8b949e] uppercase"
+								>Currency</label
+							>
 							<select
 								v-model="currency"
 								class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
@@ -148,7 +158,9 @@ defineExpose({ open })
 					</div>
 
 					<div class="space-y-1">
-						<label class="text-xs font-semibold text-[#8b949e] uppercase">Category</label>
+						<label class="text-xs font-semibold text-[#8b949e] uppercase"
+							>Category</label
+						>
 						<select
 							v-model="category"
 							class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
@@ -168,18 +180,10 @@ defineExpose({ open })
 					</div>
 
 					<div class="pt-4 flex gap-3">
-						<AppButton
-							variant="secondary"
-							class="flex-1"
-							@click="close"
-						>
+						<AppButton variant="secondary" class="flex-1" @click="close">
 							Cancel
 						</AppButton>
-						<AppButton
-							type="submit"
-							variant="primary"
-							class="flex-1"
-						>
+						<AppButton type="submit" variant="primary" class="flex-1">
 							Save Expense
 						</AppButton>
 					</div>

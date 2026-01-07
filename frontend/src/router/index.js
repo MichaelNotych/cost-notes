@@ -3,6 +3,8 @@ import AuthView from '../views/AuthView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 
+import { useAuthStore } from '@/stores/auth'
+
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
@@ -27,10 +29,9 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+	const authStore = useAuthStore()
 	if (to.meta.requiresAuth) {
-		const isAuthenticated = !!localStorage.getItem('cn_token')
-
-		if (isAuthenticated) {
+		if (authStore.isAuthenticated) {
 			next()
 		} else {
 			next({ name: 'AuthView' })

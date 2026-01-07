@@ -76,7 +76,9 @@ const defaultCurrency = computed(() => {
 				</li>
 			</ul>
 		</div>
-		<footer class="flex justify-between items-center p-4 bg-gray-950/50 border-t border-gray-700">
+		<footer
+			class="flex justify-between items-center p-4 bg-gray-950/50 border-t border-gray-700"
+		>
 			<span class="text-[#8b949e] font-semibold">Total:</span>
 			<span class="font-bold text-lg">
 				{{ dailyTotal.toFixed(2) }}

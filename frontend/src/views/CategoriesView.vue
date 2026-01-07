@@ -167,7 +167,10 @@ const onDeleteCategory = async (categoryId) => {
 							v-model="newEmoji"
 							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 text-center focus:ring-1 focus:ring-sky-600 outline-none"
 						/>
-						<small v-if="newEmojiError" class="text-red-500 text-xs absolute -bottom-5 left-0">
+						<small
+							v-if="newEmojiError"
+							class="text-red-500 text-xs absolute -bottom-5 left-0"
+						>
 							{{ newEmojiError }}
 						</small>
 					</div>
@@ -179,19 +182,16 @@ const onDeleteCategory = async (categoryId) => {
 							v-model="newName"
 							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
 						/>
-						<small v-if="newNameError" class="text-red-500 text-xs absolute -bottom-5 left-0">
+						<small
+							v-if="newNameError"
+							class="text-red-500 text-xs absolute -bottom-5 left-0"
+						>
 							{{ newNameError }}
 						</small>
 					</div>
 				</div>
 
-				<AppButton
-					type="submit"
-					variant="primary"
-					class="w-full"
-				>
-					Add Category
-				</AppButton>
+				<AppButton type="submit" variant="primary" class="w-full"> Add Category </AppButton>
 			</form>
 		</div>
 	</div>
