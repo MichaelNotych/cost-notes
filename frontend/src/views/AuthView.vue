@@ -6,6 +6,7 @@ import * as z from 'zod'
 import { useRouter } from 'vue-router'
 import axiosIns from '@/plugins/axios'
 import AppButton from '@/components/AppButton.vue'
+import AppInput from '@/components/AppInput.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -57,38 +58,26 @@ const onSubmit = handleSubmit(async (values) => {
 			</h1>
 
 			<form @submit.prevent="onSubmit" class="space-y-6">
-				<div class="space-y-2">
-					<label class="text-sm font-semibold text-gray-400 uppercase ml-1">Email</label>
-					<input
-						name="email"
-						v-model="email"
-						v-bind="emailAttrs"
-						placeholder="email@example.com"
-						autocomplete="email"
-						class="w-full bg-slate-900 border border-gray-700 rounded-xl py-3 px-4 text-gray-400 shadow-inner focus:ring-2 focus:ring-sky-600 focus:border-transparent outline-none transition-all"
-						:class="{ 'border-red-500 ring-red-500/20': errors.email }"
-					/>
-					<p v-if="errors.email" class="text-red-500 text-xs ml-1">{{ errors.email }}</p>
-				</div>
+				<AppInput
+					label="Email"
+					name="email"
+					v-model="email"
+					v-bind="emailAttrs"
+					placeholder="email@example.com"
+					autocomplete="email"
+					:error-message="errors.email"
+				/>
 
-				<div class="space-y-2">
-					<label class="text-sm font-semibold text-gray-400 uppercase ml-1"
-						>Password</label
-					>
-					<input
-						type="password"
-						name="password"
-						v-model="password"
-						v-bind="passwordAttrs"
-						placeholder="••••••••"
-						autocomplete="current-password"
-						class="w-full bg-slate-900 border border-gray-700 rounded-xl py-3 px-4 text-gray-400 shadow-inner focus:ring-2 focus:ring-sky-600 focus:border-transparent outline-none transition-all"
-						:class="{ 'border-red-500 ring-red-500/20': errors.password }"
-					/>
-					<p v-if="errors.password" class="text-red-500 text-xs ml-1">
-						{{ errors.password }}
-					</p>
-				</div>
+				<AppInput
+					label="Password"
+					type="password"
+					name="password"
+					v-model="password"
+					v-bind="passwordAttrs"
+					placeholder="••••••••"
+					autocomplete="current-password"
+					:error-message="errors.password"
+				/>
 
 				<AppButton type="submit" variant="primary" class="w-full">
 					{{ isNewUser ? 'Sign up' : 'Sign in' }}

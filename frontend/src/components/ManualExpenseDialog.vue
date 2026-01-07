@@ -6,6 +6,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useExpensesStore } from '@/stores/expenses'
 import { useCategoriesStore } from '@/stores/categories'
 import AppButton from '@/components/AppButton.vue'
+import AppInput from '@/components/AppInput.vue'
 
 const expensesStore = useExpensesStore()
 const categoriesStore = useCategoriesStore()
@@ -108,37 +109,22 @@ defineExpose({ open })
 				</header>
 
 				<form @submit.prevent="onSubmit" class="p-6 space-y-4">
-					<div class="space-y-1">
-						<label class="text-xs font-semibold text-gray-400 uppercase">Title</label>
-						<input
-							v-model="title"
-							type="text"
-							placeholder="e.g. Coffee"
-							class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
-							:class="{ 'border-red-500': errors.title }"
-						/>
-						<small v-if="errors.title" class="text-red-500 text-xs">{{
-							errors.title
-						}}</small>
-					</div>
+					<AppInput
+						label="Title"
+						v-model="title"
+						placeholder="e.g. Coffee"
+						:error-message="errors.title"
+					/>
 
 					<div class="grid grid-cols-2 gap-4">
-						<div class="space-y-1">
-							<label class="text-xs font-semibold text-gray-400 uppercase"
-								>Amount</label
-							>
-							<input
-								v-model.number="amount"
-								type="number"
-								step="0.01"
-								placeholder="0.00"
-								class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
-								:class="{ 'border-red-500': errors.amount }"
-							/>
-							<small v-if="errors.amount" class="text-red-500 text-xs">{{
-								errors.amount
-							}}</small>
-						</div>
+						<AppInput
+							label="Amount"
+							v-model.number="amount"
+							type="number"
+							step="0.01"
+							placeholder="0.00"
+							:error-message="errors.amount"
+						/>
 
 						<div class="space-y-1">
 							<label class="text-xs font-semibold text-gray-400 uppercase"

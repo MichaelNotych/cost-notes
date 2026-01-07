@@ -7,7 +7,7 @@ const authStore = useAuthStore()
 
 <template>
 	<div class="px-4 py-6 max-w-2xl mx-auto w-full">
-		<header class="flex justify-center items-center mb-8">
+		<header class="flex justify-center items-center mb-4">
 			<nav>
 				<ul class="flex items-center gap-6">
 					<template v-if="authStore.isAuthenticated">

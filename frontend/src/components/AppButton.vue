@@ -26,7 +26,7 @@ const props = defineProps({
 	},
 	rounded: {
 		type: String,
-		default: 'xl',
+		default: 'md',
 	},
 })
 
@@ -41,7 +41,7 @@ const variantClasses = {
 
 const sizeClasses = {
 	sm: 'py-2 px-4 text-sm',
-	md: 'py-3 px-6 text-base',
+	md: 'py-2.5 px-6 text-base',
 	icon: 'w-8 h-8',
 }
 

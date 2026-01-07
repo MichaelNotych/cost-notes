@@ -28,7 +28,7 @@ const defaultCurrency = computed(() => {
 </script>
 
 <template>
-	<div class="bg-gray-800/50 rounded-xl overflow-hidden mb-6 border border-gray-700 shadow-lg">
+	<div class="bg-gray-800/50 rounded-md overflow-hidden mb-6 border border-gray-700 shadow-lg">
 		<header class="flex justify-between items-center p-4 border-b border-gray-700">
 			<h3 class="font-bold text-base m-0">{{ date }}</h3>
 			<AppButton

@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import AppButton from '@/components/AppButton.vue'
+import AppInput from '@/components/AppInput.vue'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'save'])
@@ -116,45 +117,29 @@ defineExpose({
 						</select>
 					</div>
 
-					<div class="space-y-1">
-						<label class="text-xs font-semibold text-gray-400 uppercase"
-							>Description</label
-						>
-						<input
-							v-model="editedExpense.title"
-							type="text"
-							placeholder="Expense title"
-							required
-							class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
-						/>
-					</div>
+					<AppInput
+						label="Description"
+						v-model="editedExpense.title"
+						placeholder="Expense title"
+						required
+					/>
 
 					<div class="grid grid-cols-2 gap-4">
-						<div class="space-y-1">
-							<label class="text-xs font-semibold text-gray-400 uppercase"
-								>Amount</label
-							>
-							<input
-								v-model="editedExpense.amount"
-								type="number"
-								step="0.01"
-								placeholder="0.00"
-								required
-								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none"
-							/>
-						</div>
-						<div class="space-y-1">
-							<label class="text-xs font-semibold text-gray-400 uppercase"
-								>Currency</label
-							>
-							<input
-								v-model="editedExpense.currency"
-								type="text"
-								placeholder="USD"
-								required
-								class="w-full bg-slate-900 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none uppercase"
-							/>
-						</div>
+						<AppInput
+							label="Amount"
+							v-model.number="editedExpense.amount"
+							type="number"
+							step="0.01"
+							placeholder="0.00"
+							required
+						/>
+						<AppInput
+							label="Currency"
+							v-model="editedExpense.currency"
+							placeholder="USD"
+							required
+							class="uppercase"
+						/>
 					</div>
 
 					<div class="pt-4 flex gap-3">
