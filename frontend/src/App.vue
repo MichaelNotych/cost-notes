@@ -7,7 +7,7 @@ const authStore = useAuthStore()
 
 <template>
 	<div class="px-4 py-6 max-w-2xl mx-auto w-full">
-		<header class="flex justify-center items-center mb-4">
+		<header class="flex justify-center items-center mb-6">
 			<nav>
 				<ul class="flex items-center gap-6">
 					<template v-if="authStore.isAuthenticated">
@@ -36,8 +36,8 @@ const authStore = useAuthStore()
 
 <style>
 body {
-	background-color: var(--color-gray-950);
-	color: var(--color-gray-100);
+	background-color: var(--color-zinc-900);
+	color: var(--color-gray-300);
 	margin: 0;
 	padding: 0;
 }

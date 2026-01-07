@@ -92,75 +92,98 @@ const onDeleteCategory = async (categoryId) => {
 
 <template>
 	<div class="space-y-8">
-		<h2 class="text-2xl font-bold text-gray-300 mb-6">Categories</h2>
-
-		<!-- Existing Categories -->
-		<div class="space-y-4">
-			<div
-				v-for="category in categoriesStore.categories"
-				:key="category._id"
-				class="bg-gray-900 rounded-xl p-4 border border-gray-700"
+		<div v-if="categoriesStore.loading" class="h-30 flex items-center justify-center">
+			<svg
+				class="animate-spin h-5 w-5 text-current"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
 			>
-				<div class="grid grid-cols-[60px_1fr] gap-2 mb-2">
-					<AppInput
-						v-if="categoryForms[category._id]"
-						placeholder="Emoji"
-						v-model="categoryForms[category._id].emoji"
-						:error-message="categoryForms[category._id].errors.emoji"
-						class="text-center"
-					/>
+				<circle
+					class="opacity-25"
+					cx="12"
+					cy="12"
+					r="10"
+					stroke="currentColor"
+					stroke-width="4"
+				></circle>
+				<path
+					class="opacity-75"
+					fill="currentColor"
+					d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+				></path>
+			</svg>
+		</div>
+		<template v-else>
+			<!-- Existing Categories -->
+			<div class="space-y-4">
+				<div
+					v-for="category in categoriesStore.categories"
+					:key="category._id"
+					class="bg-zinc-900 rounded-xl p-4 border border-zinc-700"
+				>
+					<div class="grid grid-cols-[60px_1fr] gap-2 mb-2">
+						<AppInput
+							v-if="categoryForms[category._id]"
+							placeholder="Emoji"
+							v-model="categoryForms[category._id].emoji"
+							:error-message="categoryForms[category._id].errors.emoji"
+							class="text-center"
+						/>
 
-					<AppInput
-						v-if="categoryForms[category._id]"
-						placeholder="Category name"
-						v-model="categoryForms[category._id].name"
-						:error-message="categoryForms[category._id].errors.name"
-					/>
-				</div>
+						<AppInput
+							v-if="categoryForms[category._id]"
+							placeholder="Category name"
+							v-model="categoryForms[category._id].name"
+							:error-message="categoryForms[category._id].errors.name"
+						/>
+					</div>
 
-				<div class="flex gap-2">
-					<AppButton
-						variant="danger"
-						size="sm"
-						class="flex-1"
-						@click="onDeleteCategory(category._id)"
-					>
-						Delete
-					</AppButton>
-					<AppButton
-						variant="secondary"
-						size="sm"
-						class="flex-1"
-						@click="onUpdateCategory(category._id)"
-					>
-						Save
-					</AppButton>
+					<div class="flex gap-2">
+						<AppButton
+							variant="danger"
+							size="sm"
+							class="flex-1"
+							@click="onDeleteCategory(category._id)"
+						>
+							Delete
+						</AppButton>
+						<AppButton
+							variant="secondary"
+							size="sm"
+							class="flex-1"
+							@click="onUpdateCategory(category._id)"
+						>
+							Save
+						</AppButton>
+					</div>
 				</div>
 			</div>
-		</div>
+			<!-- Add New Category -->
+			<div class="bg-zinc-900 rounded-xl p-6 border border-zinc-700 mt-8">
+				<h3 class="text-lg font-bold text-gray-300 mb-4">Add New Category</h3>
+				<form @submit.prevent="onAddCategory" class="space-y-2">
+					<div class="grid grid-cols-[60px_1fr] gap-2">
+						<AppInput
+							placeholder="Emoji"
+							v-model="newEmoji"
+							:error-message="newEmojiError"
+							class="text-center"
+						/>
 
-		<!-- Add New Category -->
-		<div class="bg-gray-900 rounded-xl p-6 border border-gray-700 mt-8">
-			<h3 class="text-lg font-bold text-gray-300 mb-4">Add New Category</h3>
-			<form @submit.prevent="onAddCategory" class="space-y-2">
-				<div class="grid grid-cols-[60px_1fr] gap-2">
-					<AppInput
-						placeholder="Emoji"
-						v-model="newEmoji"
-						:error-message="newEmojiError"
-						class="text-center"
-					/>
+						<AppInput
+							placeholder="Category name"
+							v-model="newName"
+							:error-message="newNameError"
+						/>
+					</div>
 
-					<AppInput
-						placeholder="Category name"
-						v-model="newName"
-						:error-message="newNameError"
-					/>
-				</div>
-
-				<AppButton type="submit" variant="primary" class="w-full"> Add Category </AppButton>
-			</form>
-		</div>
+					<AppButton type="submit" size="sm" variant="primary" class="w-full">
+						Add Category
+					</AppButton>
+				</form>
+			</div>
+		</template>
 	</div>
 </template>
 

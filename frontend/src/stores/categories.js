@@ -5,6 +5,7 @@ export const useCategoriesStore = defineStore('categories', {
 	state: () => ({
 		categories: [],
 		error: null,
+		loading: false,
 	}),
 
 	actions: {
@@ -13,12 +14,15 @@ export const useCategoriesStore = defineStore('categories', {
 		 */
 		async fetchCategories() {
 			this.error = null
+			this.loading = true
 			try {
 				const response = await axiosIns.get('/categories')
 				this.categories = response.data
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to fetch categories'
+			} finally {
+				this.loading = false
 			}
 		},
 

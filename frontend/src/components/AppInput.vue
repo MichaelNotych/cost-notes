@@ -35,7 +35,7 @@ defineEmits(['update:modelValue'])
 				:value="modelValue"
 				v-bind="$attrs"
 				@input="$emit('update:modelValue', $event.target.value)"
-				class="w-full bg-slate-900/50 border border-gray-700 rounded-md py-2.5 px-4 text-gray-300 placeholder:text-gray-600 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
+				class="w-full bg-slate-900/50 border border-zinc-700 rounded-md py-2.5 px-4 text-gray-300 placeholder:text-gray-600 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
 				:class="{
 					'border-red-500/50 focus:border-red-500 focus:ring-red-500/20': errorMessage,
 				}"

@@ -36,7 +36,7 @@ const variantClasses = {
 	danger: 'bg-red-500/20 hover:bg-red-500/40 text-red-500 border-red-500/20',
 	ghost: 'bg-transparent text-sky-600 hover:underline border-transparent p-0 inline',
 	outline:
-		'bg-transparent border-gray-700 text-gray-100 hover:bg-sky-600/10 hover:text-sky-600 hover:border-sky-600',
+		'bg-transparent border-zinc-700 text-gray-100 hover:bg-sky-600/10 hover:text-sky-600 hover:border-sky-600',
 }
 
 const sizeClasses = {

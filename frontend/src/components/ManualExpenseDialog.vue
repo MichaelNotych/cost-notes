@@ -76,14 +76,14 @@ defineExpose({ open })
 	>
 		<div
 			v-if="isOpen"
-			class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-950/80 backdrop-blur-sm"
+			class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm"
 			@click="close"
 		>
 			<div
-				class="bg-gray-900 w-full max-w-md rounded-2xl border border-gray-700 shadow-2xl overflow-hidden"
+				class="bg-zinc-900 w-full max-w-md rounded-2xl border border-zinc-700 shadow-2xl overflow-hidden"
 				@click.stop
 			>
-				<header class="flex justify-between items-center p-4 border-b border-gray-700">
+				<header class="flex justify-between items-center p-4 border-b border-zinc-700">
 					<h3 class="text-gray-400 font-bold text-lg">
 						Add Expense for {{ selectedDate }}
 					</h3>
@@ -132,7 +132,7 @@ defineExpose({ open })
 							>
 							<select
 								v-model="currency"
-								class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
+								class="w-full bg-gray-800 border border-zinc-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
 								:class="{ 'border-red-500': errors.currency }"
 							>
 								<option v-for="c in currencies" :key="c" :value="c">{{ c }}</option>
@@ -149,7 +149,7 @@ defineExpose({ open })
 						>
 						<select
 							v-model="category"
-							class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
+							class="w-full bg-gray-800 border border-zinc-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
 							:class="{ 'border-red-500': errors.category }"
 						>
 							<option

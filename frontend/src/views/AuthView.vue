@@ -52,7 +52,7 @@ const onSubmit = handleSubmit(async (values) => {
 
 <template>
 	<div class="max-w-md mx-auto mt-12">
-		<div class="bg-gray-800/50 p-8 rounded-2xl border border-gray-700">
+		<div class="bg-gray-800/50 p-8 rounded-2xl border border-zinc-700">
 			<h1 class="text-3xl font-bold mb-8 text-center">
 				{{ isNewUser ? 'Create Account' : 'Welcome Back' }}
 			</h1>

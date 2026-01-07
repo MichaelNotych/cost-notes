@@ -14,6 +14,14 @@ const props = defineProps({
 	},
 })
 
+const dateObject = new Date(props.date)
+const dateString =
+	dateObject.getDate().toString().padStart(2, '0') +
+	'.' +
+	(dateObject.getMonth() + 1).toString().padStart(2, '0') +
+	'.' +
+	dateObject.getFullYear()
+
 const dailyTotal = computed(() => {
 	return props.expenses.reduce((sum, expense) => {
 		return sum + (parseFloat(expense.defaultCurrencyAmount) || 0)
@@ -28,9 +36,9 @@ const defaultCurrency = computed(() => {
 </script>
 
 <template>
-	<div class="bg-gray-800/50 rounded-md overflow-hidden mb-6 border border-gray-700 shadow-lg">
-		<header class="flex justify-between items-center p-4 border-b border-gray-700">
-			<h3 class="font-bold text-base m-0">{{ date }}</h3>
+	<div class="mb-2 bg-zinc-900/50 rounded-md">
+		<header class="flex justify-between items-center p-2 border-b border-zinc-700/20">
+			<div class="text-gray-400 font-semibold">{{ dateString }}</div>
 			<AppButton
 				variant="outline"
 				size="icon"
@@ -51,23 +59,23 @@ const defaultCurrency = computed(() => {
 				</svg>
 			</AppButton>
 		</header>
-		<div class="p-0">
+		<div>
 			<ul class="m-0 p-0 list-none">
 				<li
 					v-for="expense in expenses"
 					:key="expense._id"
-					class="flex items-center justify-between p-4 hover:bg-[#21262d] cursor-pointer border-b border-gray-700/50 last:border-0 transition-colors"
+					class="flex items-center justify-between p-2 cursor-pointer border-b border-zinc-700/20 last:border-0"
 					@click="$emit('edit-expense', expense)"
 				>
-					<div class="flex items-center gap-3">
-						<span class="text-xl leading-none" role="img" aria-label="Category">
+					<div class="flex items-center gap-2">
+						<span class="leading-none" role="img" aria-label="Category">
 							{{ expense.category?.emoji || '📝' }}
 						</span>
-						<span class="font-medium">
+						<span>
 							{{ expense.title || expense.userDescription }}
 						</span>
 					</div>
-					<div class="font-medium flex items-baseline gap-1">
+					<div class="flex items-baseline gap-1">
 						<span>{{ expense.amount }}</span>
 						<span class="text-xs text-gray-400">
 							{{ getCurrencySymbolFromCode(expense.currency) }}
@@ -76,11 +84,9 @@ const defaultCurrency = computed(() => {
 				</li>
 			</ul>
 		</div>
-		<footer
-			class="flex justify-between items-center p-4 bg-gray-950/50 border-t border-gray-700"
-		>
+		<footer class="flex justify-between items-center p-2 border-t border-zinc-700/20">
 			<span class="text-gray-400 font-semibold">Total:</span>
-			<span class="font-bold text-lg">
+			<span class="font-bold">
 				{{ dailyTotal.toFixed(2) }}
 				<span class="text-sm font-medium text-gray-400">
 					{{ getCurrencySymbolFromCode(defaultCurrency) }}
