@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 const authStore = useAuthStore()
 const menu = [
 	{
-		name: 'Home',
+		name: 'Expenses',
 		path: '/',
 	},
 	{
@@ -23,7 +23,7 @@ const menu = [
 						<RouterLink
 							:to="item.path"
 							class="p-1"
-							activeClass="border-b-2 border-sky-600"
+							activeClass="border-b-2 border-sky-600 text-gray-400"
 						>
 							{{ item.name }}
 						</RouterLink>

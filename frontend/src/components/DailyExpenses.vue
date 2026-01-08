@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
 import AppButton from '@/components/AppButton.vue'
+import PlusIcon from './icons/PlusIcon.vue'
 
 const props = defineProps({
 	date: {
@@ -36,27 +37,16 @@ const defaultCurrency = computed(() => {
 </script>
 
 <template>
-	<div class="mb-2 bg-zinc-900/50 rounded-md">
-		<header class="flex justify-between items-center p-2 border-b border-zinc-700/20">
-			<div class="text-gray-400 font-semibold">{{ dateString }}</div>
+	<div class="mb-2 bg-zinc-800/50 rounded-md">
+		<header class="flex justify-between items-center p-2 border-b border-zinc-700/30">
+			<div class="text-gray-400 font-medium">{{ dateString }}</div>
 			<AppButton
 				variant="outline"
 				size="icon"
 				rounded="lg"
 				@click="$emit('add-manual-expense', date)"
 			>
-				<svg
-					width="12"
-					height="12"
-					viewBox="0 0 12 12"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path
-						d="M5.25048 11.25V0.75H6.75048V11.25H5.25048ZM0.750488 6.75V5.25H11.2505V6.75H0.750488Z"
-						fill="currentColor"
-					/>
-				</svg>
+				<PlusIcon />
 			</AppButton>
 		</header>
 		<div>
@@ -64,7 +54,7 @@ const defaultCurrency = computed(() => {
 				<li
 					v-for="expense in expenses"
 					:key="expense._id"
-					class="flex items-center justify-between p-2 cursor-pointer border-b border-zinc-700/20 last:border-0"
+					class="flex items-center justify-between p-2 cursor-pointer border-b border-zinc-700/30 last:border-0"
 					@click="$emit('edit-expense', expense)"
 				>
 					<div class="flex items-center gap-2">
@@ -84,9 +74,9 @@ const defaultCurrency = computed(() => {
 				</li>
 			</ul>
 		</div>
-		<footer class="flex justify-between items-center p-2 border-t border-zinc-700/20">
-			<span class="text-gray-400 font-semibold">Total:</span>
-			<span class="font-bold">
+		<footer class="flex justify-between items-center p-2 border-t border-zinc-700/30">
+			<span class="text-gray-400 font-medium">Total:</span>
+			<span class="font-medium">
 				{{ dailyTotal.toFixed(2) }}
 				<span class="text-sm font-medium text-gray-400">
 					{{ getCurrencySymbolFromCode(defaultCurrency) }}

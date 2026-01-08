@@ -67,11 +67,11 @@ defineExpose({
 	>
 		<div
 			v-if="isOpen"
-			class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/80 backdrop-blur-sm"
+			class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-800/80 backdrop-blur-sm"
 			@click="close"
 		>
 			<div
-				class="bg-zinc-900 w-full max-w-md rounded-xl border border-zinc-700 overflow-hidden"
+				class="bg-zinc-800 w-full max-w-md rounded-xl border border-zinc-700 overflow-hidden"
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-zinc-700">

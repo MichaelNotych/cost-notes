@@ -13,7 +13,7 @@ import AppHeader from './components/AppHeader.vue'
 
 <style>
 body {
-	background-color: var(--color-zinc-900);
+	background-color: var(--color-zinc-800);
 	color: var(--color-gray-300);
 	margin: 0;
 	padding: 0;

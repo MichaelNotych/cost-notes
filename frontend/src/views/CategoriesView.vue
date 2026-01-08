@@ -120,7 +120,7 @@ const onDeleteCategory = async (categoryId) => {
 				<div
 					v-for="category in categoriesStore.categories"
 					:key="category._id"
-					class="bg-zinc-900 rounded-xl p-4 border border-zinc-700"
+					class="bg-zinc-800 rounded-xl p-4 border border-zinc-700"
 				>
 					<div class="grid grid-cols-[60px_1fr] gap-2 mb-2">
 						<AppInput
@@ -160,7 +160,7 @@ const onDeleteCategory = async (categoryId) => {
 				</div>
 			</div>
 			<!-- Add New Category -->
-			<div class="bg-zinc-900 rounded-xl p-6 border border-zinc-700 mt-8">
+			<div class="bg-zinc-800 rounded-xl p-6 border border-zinc-700 mt-8">
 				<h3 class="text-lg font-bold text-gray-300 mb-4">Add New Category</h3>
 				<form @submit.prevent="onAddCategory" class="space-y-2">
 					<div class="grid grid-cols-[60px_1fr] gap-2">

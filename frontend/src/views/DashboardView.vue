@@ -66,7 +66,7 @@ const handleSave = async ({ id, data }) => {
 
 				<div
 					v-if="expensesStore.groupedExpenses.length === 0"
-					class="bg-zinc-900 rounded-md p-8 text-center border border-zinc-700"
+					class="bg-zinc-800 rounded-md p-8 text-center border border-zinc-700"
 				>
 					<h3 class="font-bold mb-2">No Data</h3>
 					<p>No expenses recorded yet.</p>
@@ -77,7 +77,7 @@ const handleSave = async ({ id, data }) => {
 		<EditExpenseDialog ref="editDialog" @save="handleSave" />
 		<ManualExpenseDialog ref="manualDialog" />
 
-		<div class="fixed bottom-0 left-0 right-0 p-4 bg-zinc-900 z-10">
+		<div class="fixed bottom-0 left-0 right-0 p-4 bg-zinc-800 z-10">
 			<div class="max-w-2xl mx-auto">
 				<form
 					@submit.prevent="handleSubmit"
