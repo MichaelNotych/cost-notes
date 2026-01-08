@@ -1,33 +1,10 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth'
-import AppButton from './components/AppButton.vue'
-
-const authStore = useAuthStore()
+import AppHeader from './components/AppHeader.vue'
 </script>
 
 <template>
 	<div class="px-4 py-6 max-w-2xl mx-auto w-full">
-		<header class="flex justify-center items-center mb-6">
-			<nav>
-				<ul class="flex items-center gap-6">
-					<template v-if="authStore.isAuthenticated">
-						<li>
-							<RouterLink to="/"> Home </RouterLink>
-						</li>
-						<li>
-							<RouterLink to="/categories"> Categories </RouterLink>
-						</li>
-					</template>
-					<template v-else>
-						<li>
-							<AppButton variant="secondary" size="sm">
-								<RouterLink to="/auth">Login</RouterLink>
-							</AppButton>
-						</li>
-					</template>
-				</ul>
-			</nav>
-		</header>
+		<AppHeader />
 		<main>
 			<RouterView />
 		</main>
