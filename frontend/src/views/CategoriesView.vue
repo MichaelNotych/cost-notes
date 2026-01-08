@@ -117,11 +117,7 @@ const onDeleteCategory = async (categoryId) => {
 		<template v-else>
 			<!-- Existing Categories -->
 			<div class="space-y-4">
-				<div
-					v-for="category in categoriesStore.categories"
-					:key="category._id"
-					class="bg-zinc-800 rounded-xl p-4 border border-zinc-700"
-				>
+				<div v-for="category in categoriesStore.categories" :key="category._id">
 					<div class="grid grid-cols-[60px_1fr] gap-2 mb-2">
 						<AppInput
 							v-if="categoryForms[category._id]"
@@ -160,7 +156,7 @@ const onDeleteCategory = async (categoryId) => {
 				</div>
 			</div>
 			<!-- Add New Category -->
-			<div class="bg-zinc-800 rounded-xl p-6 border border-zinc-700 mt-8">
+			<div>
 				<h3 class="text-lg font-bold text-gray-300 mb-4">Add New Category</h3>
 				<form @submit.prevent="onAddCategory" class="space-y-2">
 					<div class="grid grid-cols-[60px_1fr] gap-2">
@@ -179,7 +175,7 @@ const onDeleteCategory = async (categoryId) => {
 					</div>
 
 					<AppButton type="submit" size="sm" variant="primary" class="w-full">
-						Add Category
+						Create
 					</AppButton>
 				</form>
 			</div>
