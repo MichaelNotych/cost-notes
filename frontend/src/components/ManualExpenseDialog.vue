@@ -6,6 +6,7 @@ import { useExpensesStore } from '@/stores/expenses'
 import { useCategoriesStore } from '@/stores/categories'
 import AppButton from '@/components/AppButton.vue'
 import AppForm from '@/components/AppForm.vue'
+import CloseIcon from './icons/CloseIcon.vue'
 
 const expensesStore = useExpensesStore()
 const categoriesStore = useCategoriesStore()
@@ -19,12 +20,12 @@ const currencies = ['LAK', 'USD', 'EUR', 'GBP', 'UAH', 'PLN', 'TRY', 'THB']
 const schema = toTypedSchema(
 	zod.object({
 		title: zod.string().min(1, 'Title is required'),
-		amount: zod
-			.number({ invalid_type_error: 'Amount must be a number' })
-			.positive('Amount must be positive'),
-		currency: zod.string().min(1, 'Currency is required'),
-		category: zod.string().min(1, 'Category is required'),
-	}),
+	amount: zod
+		.coerce.number({ invalid_type_error: 'Amount must be a number' })
+		.positive('Amount must be positive'),
+	currency: zod.string().min(1, 'Currency is required'),
+	category: zod.string().min(1, 'Category is required'),
+}),
 )
 
 const fields = computed(() => [
@@ -62,19 +63,17 @@ const fields = computed(() => [
 	},
 ])
 
+const initialValues = ref({})
+
 const open = (date) => {
 	selectedDate.value = date
+	initialValues.value = {
+		title: '',
+		amount: undefined,
+		currency: 'LAK',
+		category: categoriesStore.categories[0]?._id,
+	}
 	isOpen.value = true
-	// Wait for next tick to ensure formRef is available
-	setTimeout(() => {
-		if (formRef.value) {
-			formRef.value.resetForm()
-			formRef.value.setValues({
-				currency: 'LAK',
-				category: categoriesStore.categories[0]?._id,
-			})
-		}
-	}, 0)
 }
 
 const close = () => {
@@ -134,30 +133,10 @@ defineExpose({ open })
 						ref="formRef"
 						:fields="fields"
 						:schema="schema"
+						:initial-values="initialValues"
 						submit-text="Save Expense"
 						:on-submit="handleFormSubmit"
-					>
-						<template #actions="{ isSubmitting }">
-							<div class="pt-4 flex gap-3">
-								<AppButton
-									variant="secondary"
-									class="flex-1"
-									@click="close"
-									type="button"
-								>
-									Cancel
-								</AppButton>
-								<AppButton
-									type="submit"
-									variant="primary"
-									class="flex-1"
-									:loading="isSubmitting"
-								>
-									Save Expense
-								</AppButton>
-							</div>
-						</template>
-					</AppForm>
+					/>
 				</div>
 			</div>
 		</div>
