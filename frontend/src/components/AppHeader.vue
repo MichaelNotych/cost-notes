@@ -31,9 +31,7 @@ const menu = [
 				</template>
 				<template v-else>
 					<li>
-						<AppButton variant="secondary" size="sm">
-							<RouterLink to="/auth">Login</RouterLink>
-						</AppButton>
+						<img src="/favicon.svg" alt="Logo" width="64" height="64" class="border border-zinc-700 rounded-md" />
 					</li>
 				</template>
 			</ul>
