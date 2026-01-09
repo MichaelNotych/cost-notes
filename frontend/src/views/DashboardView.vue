@@ -68,7 +68,7 @@ const handleSave = async ({ id, data }) => {
 					v-if="expensesStore.groupedExpenses.length === 0"
 					class="bg-zinc-800 rounded-md p-8 text-center border border-zinc-700"
 				>
-					<h3 class="font-bold mb-2">No Data</h3>
+					<h3 class="font-semibold mb-2">No Data</h3>
 					<p>No expenses recorded yet.</p>
 				</div>
 			</template>

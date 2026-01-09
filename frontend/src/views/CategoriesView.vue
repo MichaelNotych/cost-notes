@@ -157,7 +157,7 @@ const onDeleteCategory = async (categoryId) => {
 			</div>
 			<!-- Add New Category -->
 			<div>
-				<h3 class="text-lg font-bold text-gray-300 mb-4">Add New Category</h3>
+				<h3 class="text-lg font-semibold text-gray-300 mb-4">Add New Category</h3>
 				<form @submit.prevent="onAddCategory" class="space-y-2">
 					<div class="grid grid-cols-[60px_1fr] gap-2">
 						<AppInput

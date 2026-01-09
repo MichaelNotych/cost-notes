@@ -84,7 +84,7 @@ defineExpose({ open })
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-zinc-700">
-					<h3 class="text-gray-400 font-bold text-lg">
+					<h3 class="text-gray-400 font-semibold text-lg">
 						Add Expense for {{ selectedDate }}
 					</h3>
 					<button

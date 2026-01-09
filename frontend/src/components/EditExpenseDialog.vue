@@ -75,7 +75,7 @@ defineExpose({
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-zinc-700">
-					<h3 class="text-gray-400 font-bold text-lg">Edit Expense</h3>
+					<h3 class="text-gray-400 font-semibold text-lg">Edit Expense</h3>
 					<button
 						@click="close"
 						class="text-gray-400 hover:text-gray-400 transition-colors"

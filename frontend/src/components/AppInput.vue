@@ -25,7 +25,7 @@ defineEmits(['update:modelValue'])
 	<div class="space-y-1.5 flex flex-col group">
 		<label
 			v-if="label"
-			class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1 group-focus-within:text-sky-500 transition-colors"
+			class="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1 group-focus-within:text-sky-500 transition-colors"
 		>
 			{{ label }}
 		</label>
