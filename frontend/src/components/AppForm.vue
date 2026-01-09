@@ -127,6 +127,7 @@ defineExpose({
 								:placeholder="field.placeholder"
 								v-bind="fieldProps"
 								:error-message="errorMessage"
+								:class="field.class"
 							/>
 						</template>
 					</Field>

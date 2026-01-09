@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useAttrs } from 'vue'
+import { useAttrs } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
@@ -15,19 +15,10 @@ defineProps({
 })
 
 const attrs = useAttrs()
-
-const inputAttrs = computed(() => {
-	const { class: className, style, ...rest } = attrs
-	return rest
-})
 </script>
 
 <template>
-	<div
-		class="space-y-1.5 flex flex-col group"
-		:class="attrs.class"
-		:style="attrs.style"
-	>
+	<div class="space-y-1.5 flex flex-col group">
 		<label
 			v-if="label"
 			class="text-xs font-semibold text-gray-500 uppercase tracking-wider ml-1 group-focus-within:text-sky-500 transition-colors"
@@ -36,7 +27,7 @@ const inputAttrs = computed(() => {
 		</label>
 		<div class="relative">
 			<input
-				v-bind="inputAttrs"
+				v-bind="attrs"
 				class="w-full bg-zinc-900/50 border border-zinc-700 rounded-md py-2.5 px-4 text-gray-300 placeholder:text-gray-600 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
 				:class="{
 					'border-red-500/50 focus:border-red-500 focus:ring-red-500/20': errorMessage,
