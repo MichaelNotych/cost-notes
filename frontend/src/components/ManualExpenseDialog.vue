@@ -118,25 +118,15 @@ defineExpose({ open })
 					<h3 class="text-gray-400 font-semibold text-lg">
 						Add Expense for {{ selectedDate }}
 					</h3>
-					<button
+					<AppButton
 						@click="close"
-						class="text-gray-400 hover:text-gray-400 transition-colors"
+						variant="outline"
+						size="icon"
+						rounded="lg"
 						aria-label="Close"
 					>
-						<svg
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<line x1="18" y1="6" x2="6" y2="18"></line>
-							<line x1="6" y1="6" x2="18" y2="18"></line>
-						</svg>
-					</button>
+						<CloseIcon />
+					</AppButton>
 				</header>
 
 				<div class="p-6">
