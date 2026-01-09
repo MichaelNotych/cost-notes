@@ -31,7 +31,13 @@ const menu = [
 				</template>
 				<template v-else>
 					<li>
-						<img src="/favicon.svg" alt="Logo" width="64" height="64" class="border border-zinc-700 rounded-md" />
+						<img
+							src="/favicon.svg"
+							alt="Logo"
+							width="64"
+							height="64"
+							class="border border-zinc-700 rounded-md"
+						/>
 					</li>
 				</template>
 			</ul>
