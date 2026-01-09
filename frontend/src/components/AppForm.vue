@@ -125,10 +125,7 @@ defineExpose({
 								:label="field.label"
 								:type="field.type || 'text'"
 								:placeholder="field.placeholder"
-								:model-value="fieldProps.value"
-								@update:model-value="fieldProps.handleChange"
-								@blur="fieldProps.handleBlur"
-								v-bind="getFieldAttrs(field)"
+								v-bind="fieldProps"
 								:error-message="errorMessage"
 							/>
 						</template>
