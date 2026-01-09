@@ -1,21 +1,17 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as z from 'zod'
 import { useCategoriesStore } from '@/stores/categories'
-import AppButton from '@/components/AppButton.vue'
-import AppInput from '@/components/AppInput.vue'
+import AppForm from '@/components/AppForm.vue'
 
-defineProps(['modelValue'])
+const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'save'])
 
 const categoriesStore = useCategoriesStore()
 const isOpen = ref(false)
-const editedExpense = ref({
-	_id: null,
-	category: null,
-	title: '',
-	amount: 0,
-	currency: 'USD',
-})
+const editedExpenseId = ref(null)
+const initialValues = ref({})
 
 onMounted(async () => {
 	if (categoriesStore.categories.length === 0) {
@@ -23,9 +19,52 @@ onMounted(async () => {
 	}
 })
 
+const validationSchema = toTypedSchema(
+	z.object({
+		category: z.string().min(1, 'Category is required'),
+		title: z.string().min(1, 'Description is required'),
+		amount: z.number({ coerce: true }).min(0.01, 'Amount must be greater than 0'),
+		currency: z.string().min(3, 'Currency is required').max(3),
+	}),
+)
+
+const fields = computed(() => [
+	{
+		name: 'category',
+		label: 'Category',
+		type: 'select',
+		options: categoriesStore.categories.map((c) => ({
+			value: c._id,
+			label: `${c.emoji} ${c.name}`,
+		})),
+		width: '100%',
+	},
+	{
+		name: 'title',
+		label: 'Description',
+		placeholder: 'Expense title',
+		width: '100%',
+	},
+	{
+		name: 'amount',
+		label: 'Amount',
+		type: 'number',
+		placeholder: '0.00',
+		step: '0.01',
+		width: '1fr',
+	},
+	{
+		name: 'currency',
+		label: 'Currency',
+		placeholder: 'USD',
+		width: '1fr',
+		class: 'uppercase',
+	},
+])
+
 const open = (expense) => {
-	editedExpense.value = {
-		_id: expense._id,
+	editedExpenseId.value = expense._id
+	initialValues.value = {
 		category: expense.category?._id || expense.category,
 		title: expense.title || expense.userDescription || '',
 		amount: expense.amount,
@@ -38,15 +77,10 @@ const close = () => {
 	isOpen.value = false
 }
 
-const save = () => {
+const onSave = async (values) => {
 	emit('save', {
-		id: editedExpense.value._id,
-		data: {
-			category: editedExpense.value.category,
-			title: editedExpense.value.title,
-			amount: editedExpense.value.amount,
-			currency: editedExpense.value.currency,
-		},
+		id: editedExpenseId.value,
+		data: values,
 	})
 	close()
 }
@@ -97,60 +131,15 @@ defineExpose({
 					</button>
 				</header>
 
-				<form @submit.prevent="save" class="p-6 space-y-4">
-					<div class="space-y-1">
-						<label class="text-xs font-semibold text-gray-400 uppercase"
-							>Category</label
-						>
-						<select
-							v-model="editedExpense.category"
-							required
-							class="w-full bg-slate-900 border border-zinc-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
-						>
-							<option
-								v-for="cat in categoriesStore.categories"
-								:key="cat._id"
-								:value="cat._id"
-							>
-								{{ cat.emoji }} {{ cat.name }}
-							</option>
-						</select>
-					</div>
-
-					<AppInput
-						label="Description"
-						v-model="editedExpense.title"
-						placeholder="Expense title"
-						required
+				<div class="p-6">
+					<AppForm
+						:fields="fields"
+						:schema="validationSchema"
+						:initial-values="initialValues"
+						:on-submit="onSave"
+						submitText="Save Changes"
 					/>
-
-					<div class="grid grid-cols-2 gap-4">
-						<AppInput
-							label="Amount"
-							v-model.number="editedExpense.amount"
-							type="number"
-							step="0.01"
-							placeholder="0.00"
-							required
-						/>
-						<AppInput
-							label="Currency"
-							v-model="editedExpense.currency"
-							placeholder="USD"
-							required
-							class="uppercase"
-						/>
-					</div>
-
-					<div class="pt-4 flex gap-3">
-						<AppButton variant="secondary" class="flex-1" @click="close">
-							Cancel
-						</AppButton>
-						<AppButton type="submit" variant="primary" class="flex-1">
-							Save Changes
-						</AppButton>
-					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 	</Transition>

@@ -1,18 +1,18 @@
 <script setup>
-import { ref } from 'vue'
-import { useForm } from 'vee-validate'
+import { ref, computed } from 'vue'
 import * as zod from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useExpensesStore } from '@/stores/expenses'
 import { useCategoriesStore } from '@/stores/categories'
 import AppButton from '@/components/AppButton.vue'
-import AppInput from '@/components/AppInput.vue'
+import AppForm from '@/components/AppForm.vue'
 
 const expensesStore = useExpensesStore()
 const categoriesStore = useCategoriesStore()
 
 const isOpen = ref(false)
 const selectedDate = ref('')
+const formRef = ref(null)
 
 const currencies = ['LAK', 'USD', 'EUR', 'GBP', 'UAH', 'PLN', 'TRY', 'THB']
 
@@ -27,30 +27,61 @@ const schema = toTypedSchema(
 	}),
 )
 
-const { defineField, handleSubmit, errors, resetForm, setValues } = useForm({
-	validationSchema: schema,
-})
-
-const [title] = defineField('title')
-const [amount] = defineField('amount')
-const [currency] = defineField('currency')
-const [category] = defineField('category')
+const fields = computed(() => [
+	{
+		name: 'title',
+		label: 'Title',
+		placeholder: 'e.g. Coffee',
+		type: 'text',
+		width: '100%',
+	},
+	{
+		name: 'amount',
+		label: 'Amount',
+		placeholder: '0.00',
+		type: 'number',
+		width: '1fr',
+		step: '0.01',
+	},
+	{
+		name: 'currency',
+		label: 'Currency',
+		type: 'select',
+		width: '120px', // Fixed width for currency
+		options: currencies.map((c) => ({ label: c, value: c })),
+	},
+	{
+		name: 'category',
+		label: 'Category',
+		type: 'select',
+		width: '100%',
+		options: categoriesStore.categories.map((c) => ({
+			label: `${c.emoji} ${c.name}`,
+			value: c._id,
+		})),
+	},
+])
 
 const open = (date) => {
 	selectedDate.value = date
-	resetForm()
-	setValues({
-		currency: 'USD',
-		category: categoriesStore.categories[0]?._id,
-	})
 	isOpen.value = true
+	// Wait for next tick to ensure formRef is available
+	setTimeout(() => {
+		if (formRef.value) {
+			formRef.value.resetForm()
+			formRef.value.setValues({
+				currency: 'LAK',
+				category: categoriesStore.categories[0]?._id,
+			})
+		}
+	}, 0)
 }
 
 const close = () => {
 	isOpen.value = false
 }
 
-const onSubmit = handleSubmit(async (values) => {
+const handleFormSubmit = async (values) => {
 	try {
 		await expensesStore.addManualExpense({
 			...values,
@@ -60,7 +91,7 @@ const onSubmit = handleSubmit(async (values) => {
 	} catch (err) {
 		console.error('Failed to add manual expense:', err)
 	}
-})
+}
 
 defineExpose({ open })
 </script>
@@ -108,72 +139,36 @@ defineExpose({ open })
 					</button>
 				</header>
 
-				<form @submit.prevent="onSubmit" class="p-6 space-y-4">
-					<AppInput
-						label="Title"
-						v-model="title"
-						placeholder="e.g. Coffee"
-						:error-message="errors.title"
-					/>
-
-					<div class="grid grid-cols-2 gap-4">
-						<AppInput
-							label="Amount"
-							v-model.number="amount"
-							type="number"
-							step="0.01"
-							placeholder="0.00"
-							:error-message="errors.amount"
-						/>
-
-						<div class="space-y-1">
-							<label class="text-xs font-semibold text-gray-400 uppercase"
-								>Currency</label
-							>
-							<select
-								v-model="currency"
-								class="w-full bg-gray-800 border border-zinc-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
-								:class="{ 'border-red-500': errors.currency }"
-							>
-								<option v-for="c in currencies" :key="c" :value="c">{{ c }}</option>
-							</select>
-							<small v-if="errors.currency" class="text-red-500 text-xs">{{
-								errors.currency
-							}}</small>
-						</div>
-					</div>
-
-					<div class="space-y-1">
-						<label class="text-xs font-semibold text-gray-400 uppercase"
-							>Category</label
-						>
-						<select
-							v-model="category"
-							class="w-full bg-gray-800 border border-zinc-700 rounded-lg py-2 px-3 text-gray-400 focus:ring-1 focus:ring-sky-600 outline-none appearance-none"
-							:class="{ 'border-red-500': errors.category }"
-						>
-							<option
-								v-for="cat in categoriesStore.categories"
-								:key="cat._id"
-								:value="cat._id"
-							>
-								{{ cat.emoji }} {{ cat.name }}
-							</option>
-						</select>
-						<small v-if="errors.category" class="text-red-500 text-xs">{{
-							errors.category
-						}}</small>
-					</div>
-
-					<div class="pt-4 flex gap-3">
-						<AppButton variant="secondary" class="flex-1" @click="close">
-							Cancel
-						</AppButton>
-						<AppButton type="submit" variant="primary" class="flex-1">
-							Save Expense
-						</AppButton>
-					</div>
-				</form>
+				<div class="p-6">
+					<AppForm
+						ref="formRef"
+						:fields="fields"
+						:schema="schema"
+						submit-text="Save Expense"
+						:on-submit="handleFormSubmit"
+					>
+						<template #actions="{ isSubmitting }">
+							<div class="pt-4 flex gap-3">
+								<AppButton
+									variant="secondary"
+									class="flex-1"
+									@click="close"
+									type="button"
+								>
+									Cancel
+								</AppButton>
+								<AppButton
+									type="submit"
+									variant="primary"
+									class="flex-1"
+									:loading="isSubmitting"
+								>
+									Save Expense
+								</AppButton>
+							</div>
+						</template>
+					</AppForm>
+				</div>
 			</div>
 		</div>
 	</Transition>
