@@ -20,12 +20,12 @@ const currencies = ['LAK', 'USD', 'EUR', 'GBP', 'UAH', 'PLN', 'TRY', 'THB']
 const schema = toTypedSchema(
 	zod.object({
 		title: zod.string().min(1, 'Title is required'),
-	amount: zod
-		.coerce.number({ invalid_type_error: 'Amount must be a number' })
-		.positive('Amount must be positive'),
-	currency: zod.string().min(1, 'Currency is required'),
-	category: zod.string().min(1, 'Category is required'),
-}),
+		amount: zod.coerce
+			.number({ invalid_type_error: 'Amount must be a number' })
+			.positive('Amount must be positive'),
+		currency: zod.string().min(1, 'Currency is required'),
+		category: zod.string().min(1, 'Category is required'),
+	}),
 )
 
 const fields = computed(() => [
