@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
 import AppButton from '@/components/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
+import AppTitle from '@/components/atoms/AppTitle.vue'
 
 const props = defineProps({
 	date: {
@@ -39,7 +40,7 @@ const defaultCurrency = computed(() => {
 <template>
 	<div class="mb-2 bg-zinc-800/50 rounded-md">
 		<header class="flex justify-between items-center p-2 border-b border-zinc-700/30">
-			<div class="text-gray-400 font-medium">{{ dateString }}</div>
+			<AppTitle variant="subtitle" class="font-mono">{{ dateString }}</AppTitle>
 			<AppButton
 				variant="outline"
 				size="icon"
@@ -66,7 +67,7 @@ const defaultCurrency = computed(() => {
 						</span>
 					</div>
 					<div class="flex items-baseline gap-1">
-						<span>{{ expense.amount }}</span>
+						<span class="font-mono">{{ expense.amount }}</span>
 						<span class="text-xs text-gray-400">
 							{{ getCurrencySymbolFromCode(expense.currency) }}
 						</span>
@@ -75,13 +76,13 @@ const defaultCurrency = computed(() => {
 			</ul>
 		</div>
 		<footer class="flex justify-between items-center p-2 border-t border-zinc-700/30">
-			<span class="text-gray-400 font-medium">Total:</span>
-			<span class="font-medium">
-				{{ dailyTotal.toFixed(2) }}
-				<span class="text-sm font-medium text-gray-400">
+			<AppTitle variant="subtitle">Total:</AppTitle>
+			<AppTitle variant="subtitle">
+				<span class="font-mono">{{ dailyTotal.toFixed(2) }}</span>
+				<span class="text-xs text-gray-400 ml-1">
 					{{ getCurrencySymbolFromCode(defaultCurrency) }}
 				</span>
-			</span>
+			</AppTitle>
 		</footer>
 	</div>
 </template>

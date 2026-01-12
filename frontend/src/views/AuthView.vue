@@ -7,6 +7,7 @@ import axiosIns from '@/plugins/axios'
 import AppButton from '@/components/AppButton.vue'
 import AppForm from '@/components/AppForm.vue'
 import { useAuthStore } from '@/stores/auth'
+import AppTitle from '@/components/atoms/AppTitle.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -56,10 +57,8 @@ const handleFormSubmit = async (values) => {
 
 <template>
 	<div class="max-w-md mx-auto mt-12">
-		<div>
-			<h1 class="text-3xl font-medium mb-8 text-center">
-				{{ isNewUser ? 'Create Account' : 'Welcome Back' }}
-			</h1>
+		<div class="space-y-8">
+			<AppTitle>{{ isNewUser ? 'Create Account' : 'Welcome Back' }}</AppTitle>
 
 			<AppForm
 				:fields="formFields"

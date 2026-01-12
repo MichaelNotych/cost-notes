@@ -7,6 +7,7 @@ import { useCategoriesStore } from '@/stores/categories'
 import AppButton from '@/components/AppButton.vue'
 import AppForm from '@/components/AppForm.vue'
 import CloseIcon from './icons/CloseIcon.vue'
+import AppTitle from './atoms/AppTitle.vue'
 
 const expensesStore = useExpensesStore()
 const categoriesStore = useCategoriesStore()
@@ -114,9 +115,7 @@ defineExpose({ open })
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-zinc-700">
-					<h3 class="text-gray-400 font-semibold text-lg">
-						Add Expense for {{ selectedDate }}
-					</h3>
+					<AppTitle variant="subtitle">{{ selectedDate }}</AppTitle>
 					<AppButton
 						@click="close"
 						variant="outline"
@@ -128,7 +127,7 @@ defineExpose({ open })
 					</AppButton>
 				</header>
 
-				<div class="p-6">
+				<div class="p-4">
 					<AppForm
 						ref="formRef"
 						:fields="fields"

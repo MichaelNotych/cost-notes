@@ -6,6 +6,7 @@ import { useCategoriesStore } from '@/stores/categories'
 import AppForm from '@/components/AppForm.vue'
 import AppButton from './AppButton.vue'
 import CloseIcon from './icons/CloseIcon.vue'
+import AppTitle from './atoms/AppTitle.vue'
 
 const props = defineProps(['modelValue'])
 const emit = defineEmits(['update:modelValue', 'save'])
@@ -111,7 +112,7 @@ defineExpose({
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-zinc-700">
-					<h3 class="text-gray-400 font-semibold text-lg">Edit Expense</h3>
+					<AppTitle variant="subtitle">Edit expense</AppTitle>
 					<AppButton
 						@click="close"
 						variant="outline"
@@ -123,7 +124,7 @@ defineExpose({
 					</AppButton>
 				</header>
 
-				<div class="p-6">
+				<div class="p-4">
 					<AppForm
 						:fields="fields"
 						:schema="validationSchema"

@@ -6,6 +6,7 @@ import * as z from 'zod'
 import AppButton from '@/components/AppButton.vue'
 import AppForm from '@/components/AppForm.vue'
 import SpinnerIcon from '@/components/icons/SpinnerIcon.vue'
+import AppTitle from '@/components/atoms/AppTitle.vue'
 
 const categoriesStore = useCategoriesStore()
 
@@ -69,6 +70,7 @@ const onDeleteCategory = async (categoryId) => {
 		<template v-else>
 			<!-- Existing Categories -->
 			<div class="space-y-8">
+				<AppTitle variant="subtitle">Categories</AppTitle>
 				<div
 					v-for="category in categoriesStore.categories"
 					:key="category._id"
@@ -107,8 +109,8 @@ const onDeleteCategory = async (categoryId) => {
 			</div>
 
 			<!-- Add New Category -->
-			<div class="pt-4 border-t border-zinc-700">
-				<h3 class="text-lg font-semibold text-gray-300 mb-4">Add New Category</h3>
+			<div class="pt-4 space-y-4 border-t border-zinc-700">
+				<AppTitle variant="subtitle">Add New Category</AppTitle>
 				<AppForm
 					:fields="fields"
 					:schema="categorySchema"
