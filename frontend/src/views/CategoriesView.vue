@@ -49,18 +49,20 @@ const onAddCategory = async (values, { resetForm }) => {
 </script>
 
 <template>
-	<div class="space-y-8">
+	<div class="space-y-4">
 		<div v-if="categoriesStore.loading" class="h-30 flex items-center justify-center">
 			<SpinnerIcon />
 		</div>
 		<template v-else>
 			<!-- Existing Categories -->
 			<AppTitle>Categories</AppTitle>
-			<CategoryItem
-				v-for="category in categoriesStore.categories"
-				:key="category._id"
-				:category="category"
-			/>
+			<div class="space-y-2">
+				<CategoryItem
+					v-for="category in categoriesStore.categories"
+					:key="category._id"
+					:category="category"
+				/>
+			</div>
 
 			<!-- Add New Category -->
 			<AppButton
