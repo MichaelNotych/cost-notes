@@ -36,6 +36,10 @@ const handleSave = async ({ id, data }) => {
 		console.error('Failed to update expense:', err)
 	}
 }
+
+onMounted(async () => {
+	await expensesStore.fetchExpenses()
+})
 </script>
 
 <template>
