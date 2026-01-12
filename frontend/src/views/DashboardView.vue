@@ -13,6 +13,7 @@ const editDialog = ref(null)
 const manualDialog = ref(null)
 
 const handleSubmit = async () => {
+	window.scrollTo({ top: 0, behavior: 'smooth' })
 	try {
 		await expensesStore.addExpense(expense.value)
 		expense.value = ''
@@ -44,7 +45,7 @@ onMounted(async () => {
 
 <template>
 	<div class="flex flex-col flex-1 relative min-h-0">
-		<div class="flex-1 overflow-y-auto pb-24 scrollbar-hide">
+		<div class="flex-1 overflow-y-auto mb-40 scrollbar-hide">
 			<div
 				class="flex justify-center items-center py-8"
 				v-if="expensesStore.isLoadingExpenses"
