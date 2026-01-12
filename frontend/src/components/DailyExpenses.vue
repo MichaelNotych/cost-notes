@@ -20,9 +20,7 @@ const dateObject = new Date(props.date)
 const dateString =
 	dateObject.getDate().toString().padStart(2, '0') +
 	'.' +
-	(dateObject.getMonth() + 1).toString().padStart(2, '0') +
-	'.' +
-	dateObject.getFullYear()
+	(dateObject.getMonth() + 1).toString().padStart(2, '0')
 
 const dailyTotal = computed(() => {
 	return props.expenses.reduce((sum, expense) => {
@@ -38,9 +36,17 @@ const defaultCurrency = computed(() => {
 </script>
 
 <template>
-	<div class="mb-2 bg-zinc-800/50 rounded-md">
-		<header class="flex justify-between items-center p-2 border-b border-zinc-700/30">
+	<article class="mb-2 bg-zinc-900/20 p-2 rounded-md">
+		<header class="flex items-center gap-4 p-2 border-b border-zinc-700/30">
 			<AppTitle variant="subtitle" class="font-mono">{{ dateString }}</AppTitle>
+			<AppTitle variant="subtitle" class="font-mono opacity-20">|</AppTitle>
+			<AppTitle variant="subtitle">
+				<span class="font-mono">{{ dailyTotal.toFixed(2) }}</span>
+				<span class="text-xs text-gray-400 ml-1">
+					{{ getCurrencySymbolFromCode(defaultCurrency) }}
+				</span>
+			</AppTitle>
+			<AppTitle variant="subtitle" class="font-mono opacity-20">|</AppTitle>
 			<AppButton
 				variant="outline"
 				size="icon"
@@ -75,14 +81,5 @@ const defaultCurrency = computed(() => {
 				</li>
 			</ul>
 		</div>
-		<footer class="flex justify-between items-center p-2 border-t border-zinc-700/30">
-			<AppTitle variant="subtitle">Total:</AppTitle>
-			<AppTitle variant="subtitle">
-				<span class="font-mono">{{ dailyTotal.toFixed(2) }}</span>
-				<span class="text-xs text-gray-400 ml-1">
-					{{ getCurrencySymbolFromCode(defaultCurrency) }}
-				</span>
-			</AppTitle>
-		</footer>
-	</div>
+	</article>
 </template>
