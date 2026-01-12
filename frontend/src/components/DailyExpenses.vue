@@ -4,6 +4,7 @@ import getCurrencySymbolFromCode from '@/plugins/currencies'
 import AppButton from '@/components/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'
+import Card from './Card.vue'
 
 const props = defineProps({
 	date: {
@@ -43,7 +44,7 @@ const formatAmount = (value) => {
 </script>
 
 <template>
-	<article class="mb-2 bg-zinc-900/20 p-2 rounded-xl">
+	<Card class="mb-2">
 		<header class="flex items-center gap-2 p-2 border-b border-zinc-700/30">
 			<AppTitle variant="subtitle" class="mr-auto">{{ dateString }}</AppTitle>
 			<AppButton
@@ -88,5 +89,5 @@ const formatAmount = (value) => {
 				</li>
 			</ul>
 		</div>
-	</article>
+	</Card>
 </template>

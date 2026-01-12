@@ -8,6 +8,7 @@ import AppForm from '@/components/AppForm.vue'
 import AppButton from '@/components/AppButton.vue'
 import SpinnerIcon from '@/components/icons/SpinnerIcon.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'
+import Card from '@/components/Card.vue'
 
 const categoriesStore = useCategoriesStore()
 const isCreating = ref(false)
@@ -55,14 +56,13 @@ const onAddCategory = async (values, { resetForm }) => {
 		</div>
 		<template v-else>
 			<!-- Existing Categories -->
-			<AppTitle>Categories</AppTitle>
-			<div class="space-y-2">
+			<Card class="space-y-2">
 				<CategoryItem
 					v-for="category in categoriesStore.categories"
 					:key="category._id"
 					:category="category"
 				/>
-			</div>
+			</Card>
 
 			<!-- Add New Category -->
 			<AppButton

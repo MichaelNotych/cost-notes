@@ -58,7 +58,9 @@ const handleFormSubmit = async (values) => {
 <template>
 	<div class="max-w-md mx-auto mt-12">
 		<div class="space-y-8 px-4">
-			<AppTitle class="text-center">{{ isNewUser ? 'Create Account' : 'Welcome Back' }}</AppTitle>
+			<AppTitle class="text-center">{{
+				isNewUser ? 'Create Account' : 'Welcome Back'
+			}}</AppTitle>
 
 			<AppForm
 				:fields="formFields"
