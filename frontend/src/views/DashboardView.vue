@@ -8,7 +8,7 @@ import AppButton from '@/components/AppButton.vue'
 
 const expensesStore = useExpensesStore()
 
-const formBottom = ref('5rem')
+const formBottom = ref('6.25rem')
 
 const handleResize = () => {
 	if (!window.visualViewport) return
@@ -21,7 +21,7 @@ const handleResize = () => {
 	if (offset > 100) {
 		formBottom.value = `${offset}px`
 	} else {
-		formBottom.value = '5rem'
+		formBottom.value = '6.25rem'
 	}
 }
 
@@ -107,7 +107,7 @@ const handleSave = async ({ id, data }) => {
 		<ManualExpenseDialog ref="manualDialog" />
 
 		<div
-			class="fixed left-0 right-0 p-4 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
+			class="fixed left-0 right-0 p-4 pb-0 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
 			:style="{ bottom: formBottom }"
 		>
 			<form
