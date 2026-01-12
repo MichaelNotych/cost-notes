@@ -64,7 +64,7 @@ defineExpose({
 		class="space-y-6"
 		v-slot="{ isSubmitting, errors }"
 	>
-		<div class="flex flex-wrap gap-x-4 gap-y-4">
+		<div class="flex flex-wrap gap-x-2 gap-y-4">
 			<template v-for="field in fields" :key="field.name">
 				<div
 					:style="{
