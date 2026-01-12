@@ -17,7 +17,7 @@ const handleResize = () => {
 	if (!isIOS) return
 
 	const offset = window.innerHeight - window.visualViewport.height
-	
+
 	if (offset > 100) {
 		formBottom.value = `${offset}px`
 	} else {
@@ -27,7 +27,7 @@ const handleResize = () => {
 
 onMounted(() => {
 	expensesStore.fetchExpenses()
-	
+
 	if (window.visualViewport) {
 		window.visualViewport.addEventListener('resize', handleResize)
 		window.visualViewport.addEventListener('scroll', handleResize)
