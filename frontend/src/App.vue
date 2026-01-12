@@ -3,7 +3,7 @@ import AppHeader from './components/AppHeader.vue'
 </script>
 
 <template>
-	<div class="px-4 py-6 max-w-2xl mx-auto w-full">
+	<div class="px-2 py-6 max-w-2xl mx-auto w-full">
 		<main>
 			<RouterView />
 		</main>
