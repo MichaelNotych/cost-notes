@@ -1,14 +1,16 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import AppButton from '@/components/AppButton.vue'
+import CategoryItem from '@/components/CategoryItem.vue'
 import AppForm from '@/components/AppForm.vue'
+import AppButton from '@/components/AppButton.vue'
 import SpinnerIcon from '@/components/icons/SpinnerIcon.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'
 
 const categoriesStore = useCategoriesStore()
+const isCreating = ref(false)
 
 const categorySchema = toTypedSchema(
 	z.object({
@@ -39,25 +41,9 @@ const onAddCategory = async (values, { resetForm }) => {
 	try {
 		await categoriesStore.addCategory(values)
 		resetForm()
+		isCreating.value = false
 	} catch (err) {
 		console.error('Failed to add category:', err)
-	}
-}
-
-const onUpdateCategory = async (values, categoryId) => {
-	try {
-		await categoriesStore.updateCategory(categoryId, values)
-	} catch (err) {
-		console.error('Failed to update category:', err)
-	}
-}
-
-const onDeleteCategory = async (categoryId) => {
-	if (!confirm('Are you sure?')) return
-	try {
-		await categoriesStore.deleteCategory(categoryId)
-	} catch (err) {
-		console.error('Failed to delete category:', err)
 	}
 }
 </script>
@@ -69,55 +55,46 @@ const onDeleteCategory = async (categoryId) => {
 		</div>
 		<template v-else>
 			<!-- Existing Categories -->
-			<div class="space-y-8">
-				<AppTitle variant="subtitle">Categories</AppTitle>
-				<div
-					v-for="category in categoriesStore.categories"
-					:key="category._id"
-					class="pb-8 border-b border-zinc-700 last:border-0"
-				>
-					<AppForm
-						:fields="fields"
-						:schema="categorySchema"
-						:initial-values="{ emoji: category.emoji, name: category.name }"
-						:on-submit="(values) => onUpdateCategory(values, category._id)"
-					>
-						<template #actions="{ isSubmitting }">
-							<div class="flex gap-2">
-								<AppButton
-									variant="danger"
-									size="sm"
-									class="flex-1"
-									type="button"
-									@click="onDeleteCategory(category._id)"
-								>
-									Delete
-								</AppButton>
-								<AppButton
-									variant="secondary"
-									size="sm"
-									class="flex-1"
-									type="submit"
-									:loading="isSubmitting"
-								>
-									Save
-								</AppButton>
-							</div>
-						</template>
-					</AppForm>
-				</div>
-			</div>
+			<AppTitle>Categories</AppTitle>
+			<CategoryItem
+				v-for="category in categoriesStore.categories"
+				:key="category._id"
+				:category="category"
+			/>
 
 			<!-- Add New Category -->
-			<div class="pt-4 space-y-4 border-t border-zinc-700">
-				<AppTitle variant="subtitle">Add New Category</AppTitle>
-				<AppForm
-					:fields="fields"
-					:schema="categorySchema"
-					:on-submit="onAddCategory"
-					submit-text="Create"
-				/>
-			</div>
+			<AppButton
+				v-if="!isCreating"
+				variant="secondary"
+				class="w-full"
+				@click="isCreating = true"
+			>
+				Create category
+			</AppButton>
+			<AppForm v-else :fields="fields" :schema="categorySchema" :on-submit="onAddCategory">
+				<template #actions="{ isSubmitting }">
+					<div class="flex gap-2">
+						<AppButton
+							variant="secondary"
+							size="sm"
+							class="flex-1"
+							type="button"
+							@click="isCreating = false"
+						>
+							Cancel
+						</AppButton>
+						<AppButton
+							variant="primary"
+							size="sm"
+							class="flex-1"
+							type="submit"
+							:loading="isSubmitting"
+						>
+							Create
+						</AppButton>
+					</div>
+				</template>
+			</AppForm>
 		</template>
 	</div>
 </template>
