@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
@@ -8,8 +8,37 @@ import AppButton from '@/components/AppButton.vue'
 
 const expensesStore = useExpensesStore()
 
+const formBottom = ref('5rem')
+
+const handleResize = () => {
+	if (!window.visualViewport) return
+
+	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+	if (!isIOS) return
+
+	const offset = window.innerHeight - window.visualViewport.height
+	
+	if (offset > 100) {
+		formBottom.value = `${offset}px`
+	} else {
+		formBottom.value = '5rem'
+	}
+}
+
 onMounted(() => {
 	expensesStore.fetchExpenses()
+	
+	if (window.visualViewport) {
+		window.visualViewport.addEventListener('resize', handleResize)
+		window.visualViewport.addEventListener('scroll', handleResize)
+	}
+})
+
+onUnmounted(() => {
+	if (window.visualViewport) {
+		window.visualViewport.removeEventListener('resize', handleResize)
+		window.visualViewport.removeEventListener('scroll', handleResize)
+	}
 })
 
 const expense = ref('')
@@ -77,32 +106,32 @@ const handleSave = async ({ id, data }) => {
 		<EditExpenseDialog ref="editDialog" @save="handleSave" />
 		<ManualExpenseDialog ref="manualDialog" />
 
-		<div class="fixed bottom-0 left-0 right-0 p-4 bg-zinc-800 z-10">
-			<div class="max-w-2xl mx-auto">
-				<form
-					@submit.prevent="handleSubmit"
-					class="flex gap-0 overflow-hidden rounded-md border border-zinc-700"
+		<div
+			class="fixed left-0 right-0 p-4 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
+			:style="{ bottom: formBottom }"
+		>
+			<form
+				@submit.prevent="handleSubmit"
+				class="flex gap-0 overflow-hidden rounded-full border border-zinc-700 max-w-xl mx-auto"
+			>
+				<input
+					name="expense"
+					type="text"
+					placeholder="Enter your expense"
+					autocomplete="off"
+					v-model="expense"
+					class="flex-1 bg-transparent border-none py-3 px-4 text-gray-100 placeholder-gray-600 focus:ring-0 outline-none"
+				/>
+				<AppButton
+					type="submit"
+					variant="primary"
+					rounded="none"
+					:loading="expensesStore.isAddingExpense"
+					:disabled="!expense.trim()"
 				>
-					<input
-						name="expense"
-						type="text"
-						placeholder="Enter your expense"
-						autocomplete="off"
-						v-model="expense"
-						class="flex-1 bg-transparent border-none py-3 px-4 text-gray-100 placeholder-gray-600 focus:ring-0 outline-none"
-					/>
-					<AppButton
-						type="submit"
-						variant="primary"
-						rounded="none"
-						:loading="expensesStore.isAddingExpense"
-						:disabled="!expense.trim()"
-						class="min-w-[100px]"
-					>
-						Add
-					</AppButton>
-				</form>
-			</div>
+					Add
+				</AppButton>
+			</form>
 		</div>
 	</div>
 </template>

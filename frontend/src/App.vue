@@ -4,10 +4,10 @@ import AppHeader from './components/AppHeader.vue'
 
 <template>
 	<div class="px-4 py-6 max-w-2xl mx-auto w-full">
-		<AppHeader />
 		<main>
 			<RouterView />
 		</main>
+		<AppHeader />
 	</div>
 </template>
 
