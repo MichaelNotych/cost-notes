@@ -8,39 +8,6 @@ import AppButton from '@/components/AppButton.vue'
 
 const expensesStore = useExpensesStore()
 
-const formBottom = ref('6.25rem')
-
-const handleResize = () => {
-	if (!window.visualViewport) return
-
-	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-	if (!isIOS) return
-
-	const offset = window.innerHeight - window.visualViewport.height
-
-	if (offset > 100) {
-		formBottom.value = `${offset}px`
-	} else {
-		formBottom.value = '6.25rem'
-	}
-}
-
-onMounted(() => {
-	expensesStore.fetchExpenses()
-
-	if (window.visualViewport) {
-		window.visualViewport.addEventListener('resize', handleResize)
-		window.visualViewport.addEventListener('scroll', handleResize)
-	}
-})
-
-onUnmounted(() => {
-	if (window.visualViewport) {
-		window.visualViewport.removeEventListener('resize', handleResize)
-		window.visualViewport.removeEventListener('scroll', handleResize)
-	}
-})
-
 const expense = ref('')
 const editDialog = ref(null)
 const manualDialog = ref(null)
@@ -107,8 +74,7 @@ const handleSave = async ({ id, data }) => {
 		<ManualExpenseDialog ref="manualDialog" />
 
 		<div
-			class="fixed left-0 right-0 p-4 pb-0 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
-			:style="{ bottom: formBottom }"
+			class="fixed bottom-25 left-0 right-0 p-4 pb-0 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
 		>
 			<form
 				@submit.prevent="handleSubmit"
