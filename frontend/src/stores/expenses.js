@@ -11,6 +11,46 @@ export const useExpensesStore = defineStore('expenses', {
 
 	getters: {
 		/**
+		 * Total amounts per day for the current week (Monday to Sunday)
+		 * Returns an array of { label: string, value: number }
+		 */
+		currentWeekDailyTotals: (state) => {
+			if (!state.expenses) return []
+
+			const today = new Date()
+			const currentDay = today.getDay() // 0 (Sun) to 6 (Sat)
+			// Adjust so Monday is 0, Sunday is 6
+			const mondayDiff = currentDay === 0 ? -6 : 1 - currentDay
+			const monday = new Date(today)
+			monday.setDate(today.getDate() + mondayDiff)
+			monday.setHours(0, 0, 0, 0)
+
+			const days = []
+			for (let i = 0; i < 7; i++) {
+				const date = new Date(monday)
+				date.setDate(monday.getDate() + i)
+				days.push({
+					date: date.toDateString(),
+					label: date.toLocaleDateString(undefined, { weekday: 'short' }),
+					value: 0,
+				})
+			}
+
+			state.expenses.forEach((expense) => {
+				const expenseDate = new Date(expense.createdAt)
+				expenseDate.setHours(0, 0, 0, 0)
+				const expenseDateString = expenseDate.toDateString()
+
+				const dayEntry = days.find((d) => d.date === expenseDateString)
+				if (dayEntry) {
+					dayEntry.value += expense.defaultCurrencyAmount || 0
+				}
+			})
+
+			return days.map(({ label, value }) => ({ label, value }))
+		},
+
+		/**
 		 * Group expenses by date in descending order
 		 * Returns an array of { date: string, items: Expense[] }
 		 */

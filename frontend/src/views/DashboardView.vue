@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
 import ManualExpenseDialog from '@/components/ManualExpenseDialog.vue'
 import AppButton from '@/components/AppButton.vue'
+import WeeklyChart from '@/components/WeeklyChart.vue'
 
 const expensesStore = useExpensesStore()
 
@@ -56,6 +57,8 @@ onMounted(async () => {
 			</div>
 
 			<template v-else>
+				<WeeklyChart />
+
 				<DailyExpenses
 					v-for="group in expensesStore.groupedExpenses"
 					:key="group.date"
