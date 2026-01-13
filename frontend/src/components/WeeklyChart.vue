@@ -4,6 +4,10 @@ import { Chart, registerables } from 'chart.js'
 import { useExpensesStore } from '@/stores/expenses'
 import AppTitle from './atoms/AppTitle.vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
+import AppButton from './AppButton.vue'
+import PlusIcon from './icons/PlusIcon.vue'
+
+defineEmits(['add-manual-expense'])
 
 Chart.register(...registerables)
 
@@ -111,8 +115,16 @@ const weeklyTotal = computed(() => {
 
 <template>
 	<div class="bg-zinc-800/50 border border-zinc-700/50 rounded-2xl p-4 mb-6">
-		<div class="flex items-center justify-between mb-4">
-			<AppTitle variant="subtitle">Weekly total:</AppTitle>
+		<div class="flex items-center gap-3 mb-4">
+			<AppTitle variant="subtitle" class="mr-auto">Weekly total:</AppTitle>
+			<AppButton
+				variant="outline"
+				size="icon"
+				rounded="full"
+				@click="$emit('add-manual-expense', new Date().toISOString(), true)"
+			>
+				<PlusIcon class="opacity-50" />
+			</AppButton>
 			<AppTitle variant="subtitle">
 				<span class="font-mono">
 					{{ weeklyTotal.toLocaleString() }}

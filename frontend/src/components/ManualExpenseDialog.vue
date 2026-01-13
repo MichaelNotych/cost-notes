@@ -13,6 +13,7 @@ const expensesStore = useExpensesStore()
 const categoriesStore = useCategoriesStore()
 
 const isOpen = ref(false)
+const isWeekMode = ref(false)
 const selectedDate = ref('')
 const formRef = ref(null)
 
@@ -26,53 +27,73 @@ const schema = toTypedSchema(
 			.positive('Amount must be positive'),
 		currency: zod.string().min(1, 'Currency is required'),
 		category: zod.string().min(1, 'Category is required'),
+		date: zod.string().optional(),
 	}),
 )
 
-const fields = computed(() => [
-	{
-		name: 'title',
-		label: 'Title',
-		placeholder: 'e.g. Coffee',
-		type: 'text',
-		width: '100%',
-	},
-	{
-		name: 'amount',
-		label: 'Amount',
-		placeholder: '0.00',
-		type: 'number',
-		width: '1fr',
-		step: '0.01',
-	},
-	{
-		name: 'currency',
-		label: 'Currency',
-		type: 'select',
-		width: '120px', // Fixed width for currency
-		options: currencies.map((c) => ({ label: c, value: c })),
-	},
-	{
-		name: 'category',
-		label: 'Category',
-		type: 'select',
-		width: '100%',
-		options: categoriesStore.categories.map((c) => ({
-			label: `${c.emoji} ${c.name}`,
-			value: c._id,
-		})),
-	},
-])
+const fields = computed(() => {
+	const baseFields = [
+		{
+			name: 'title',
+			label: 'Title',
+			placeholder: 'e.g. Coffee',
+			type: 'text',
+			width: '100%',
+		},
+		{
+			name: 'amount',
+			label: 'Amount',
+			placeholder: '0.00',
+			type: 'number',
+			width: '1fr',
+			step: '0.01',
+		},
+		{
+			name: 'currency',
+			label: 'Currency',
+			type: 'select',
+			width: '120px', // Fixed width for currency
+			options: currencies.map((c) => ({ label: c, value: c })),
+		},
+		{
+			name: 'category',
+			label: 'Category',
+			type: 'select',
+			width: '100%',
+			options: categoriesStore.categories.map((c) => ({
+				label: `${c.emoji} ${c.name}`,
+				value: c._id,
+			})),
+		},
+	]
+
+	if (isWeekMode.value) {
+		baseFields.push({
+			name: 'date',
+			label: 'Date',
+			type: 'select',
+			width: '100%',
+			options: expensesStore.currentWeekDailyTotals.map((d) => ({
+				label: d.label,
+				value: d.date,
+			})),
+		})
+	}
+
+	return baseFields
+})
 
 const initialValues = ref({})
 
-const open = (date) => {
+const open = (date, isWeek = false) => {
 	selectedDate.value = date
+	isWeekMode.value = isWeek
 	initialValues.value = {
 		title: '',
 		amount: undefined,
-		currency: 'LAK',
+		currency: 'VND',
 		category: categoriesStore.categories[0]?._id,
+		date: isWeek ? expensesStore.currentWeekDailyTotals[0]?.date : date,
 	}
 	isOpen.value = true
 }
@@ -83,9 +104,10 @@ const close = () => {
 
 const handleFormSubmit = async (values) => {
 	try {
+		const { date, ...rest } = values
 		await expensesStore.addManualExpense({
-			...values,
-			createdAt: new Date(selectedDate.value),
+			...rest,
+			createdAt: new Date(isWeekMode.value ? date : selectedDate.value),
 		})
 		close()
 	} catch (err) {
@@ -115,7 +137,9 @@ defineExpose({ open })
 				@click.stop
 			>
 				<header class="flex justify-between items-center p-4 border-b border-zinc-700">
-					<AppTitle variant="subtitle">{{ selectedDate }}</AppTitle>
+					<AppTitle variant="subtitle">
+						{{ isWeekMode ? 'Add Expense' : selectedDate }}
+					</AppTitle>
 					<AppButton
 						@click="close"
 						variant="outline"

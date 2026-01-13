@@ -27,8 +27,8 @@ const handleEdit = (expense) => {
 	editDialog.value.open(expense)
 }
 
-const handleAddManual = (date) => {
-	manualDialog.value.open(date)
+const handleAddManual = (date, isWeek = false) => {
+	manualDialog.value.open(date, isWeek)
 }
 
 const handleSave = async ({ id, data }) => {
@@ -57,7 +57,7 @@ onMounted(async () => {
 			</div>
 
 			<template v-else>
-				<WeeklyChart />
+				<WeeklyChart @add-manual-expense="handleAddManual" />
 
 				<DailyExpenses
 					v-for="group in expensesStore.groupedExpenses"

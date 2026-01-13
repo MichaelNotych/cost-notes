@@ -47,7 +47,11 @@ export const useExpensesStore = defineStore('expenses', {
 				}
 			})
 
-			return days.map(({ label, value }) => ({ label, value }))
+			return days.map(({ label, date, value }) => ({
+				label,
+				date: new Date(date).toISOString(),
+				value,
+			}))
 		},
 
 		/**
