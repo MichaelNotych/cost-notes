@@ -49,7 +49,7 @@ const handleFormSubmit = async (values) => {
 		throw new Error(data.message || 'Authentication failed')
 	}
 
-	authStore.setUser(data.user, data.token)
+	authStore.setUser(data.user, data.accessToken, data.refreshToken)
 
 	router.push('/')
 }

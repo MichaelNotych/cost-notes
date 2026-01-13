@@ -1,5 +1,8 @@
 <script setup>
 import AppHeader from './components/AppHeader.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 </script>
 
 <template>
@@ -7,7 +10,7 @@ import AppHeader from './components/AppHeader.vue'
 		<main>
 			<RouterView />
 		</main>
-		<AppHeader />
+		<AppHeader v-if="authStore.isAuthenticated" />
 	</div>
 </template>
 
