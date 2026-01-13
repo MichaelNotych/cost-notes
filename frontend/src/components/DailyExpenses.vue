@@ -44,7 +44,7 @@ const formatAmount = (value) => {
 </script>
 
 <template>
-	<Card class="mb-2">
+	<Card class="mb-1">
 		<header class="flex items-center gap-2 p-2 border-b border-zinc-700/30">
 			<AppTitle variant="subtitle" class="mr-auto">{{ dateString }}</AppTitle>
 			<AppButton
