@@ -83,7 +83,7 @@ onMounted(async () => {
 		>
 			<form
 				@submit.prevent="handleSubmit"
-				class="flex gap-0 overflow-hidden rounded-full border border-zinc-700 max-w-xl mx-auto"
+				class="flex gap-0 overflow-hidden rounded-full border border-zinc-700/30 max-w-xl mx-auto"
 			>
 				<input
 					name="expense"
@@ -91,7 +91,7 @@ onMounted(async () => {
 					placeholder="Enter your expense"
 					autocomplete="off"
 					v-model="expense"
-					class="flex-1 bg-transparent border-none py-3 px-4 text-gray-100 placeholder-gray-600 focus:ring-0 outline-none"
+					class="flex-1 bg-transparent border-none py-3 px-4 text-gray-100 placeholder-gray-400 focus:ring-0 outline-none"
 				/>
 				<AppButton
 					type="submit"
