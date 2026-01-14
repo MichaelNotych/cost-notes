@@ -115,9 +115,9 @@ defineExpose({
 					<AppTitle variant="subtitle">Edit expense</AppTitle>
 					<AppButton
 						@click="close"
-						variant="outline"
+						variant="secondary"
 						size="icon"
-						rounded="lg"
+						rounded="full"
 						aria-label="Close"
 					>
 						<CloseIcon />

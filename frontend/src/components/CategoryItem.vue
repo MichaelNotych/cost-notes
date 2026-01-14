@@ -67,9 +67,8 @@ const onDeleteCategory = async () => {
 				size="icon"
 				rounded="full"
 				@click="isEditing = true"
-				class="opacity-50"
 			>
-				<PencilIcon class="w-3 h-3" />
+				<PencilIcon  />
 			</AppButton>
 		</div>
 

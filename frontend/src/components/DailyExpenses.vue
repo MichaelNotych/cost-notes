@@ -48,12 +48,12 @@ const formatAmount = (value) => {
 		<header class="flex items-center gap-2 p-2 border-b border-zinc-700/30">
 			<AppTitle variant="subtitle" class="mr-auto">{{ dateString }}</AppTitle>
 			<AppButton
-				variant="outline"
+				variant="secondary"
 				size="icon"
 				rounded="full"
 				@click="$emit('add-manual-expense', date)"
 			>
-				<PlusIcon class="opacity-50" />
+				<PlusIcon />
 			</AppButton>
 			<AppTitle variant="subtitle">
 				<span class="font-mono">{{ formatAmount(dailyTotal.toFixed(2)) }}</span>

@@ -118,12 +118,12 @@ const weeklyTotal = computed(() => {
 		<div class="flex items-center gap-3 mb-4">
 			<AppTitle variant="subtitle" class="mr-auto">Weekly total:</AppTitle>
 			<AppButton
-				variant="outline"
+				variant="secondary"
 				size="icon"
 				rounded="full"
 				@click="$emit('add-manual-expense', new Date().toISOString(), true)"
 			>
-				<PlusIcon class="opacity-50" />
+				<PlusIcon />
 			</AppButton>
 			<AppTitle variant="subtitle">
 				<span class="font-mono">
