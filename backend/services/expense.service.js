@@ -7,29 +7,46 @@ const { status } = require("http-status");
 const categoryService = require("./category.service");
 const rateService = require("./rate.service");
 const logger = require("../config/logger");
+const { parseAiJson } = require("../utils/ai");
+
 const ai = new GoogleGenAI({ apiKey: googleApiKey });
 
-const addExpense = async (expense, userId) => {
-    const newExpense = await Expense.create({
-        ...expense,
+/**
+ * Internal helper to create and save an expense record with currency conversion and population.
+ * @private
+ */
+const _saveExpenseRecord = async (expenseData, userId) => {
+    const { amount, currency, title, category, userDescription, createdAt } =
+        expenseData;
+
+    const convertedAmount = await rateService.convertAmount(amount, currency);
+
+    const expense = await Expense.create({
+        title,
+        amount,
+        currency,
+        category,
+        userDescription: userDescription || title,
         userId,
+        defaultCurrencyAmount: convertedAmount,
+        defaultCurrency: "USD", // TODO: Move to config in point 1
+        createdAt: createdAt || new Date(),
     });
 
+    return Expense.findById(expense._id).populate("category");
+};
+
+/**
+ * Add an expense by parsing user description with AI.
+ */
+const addExpense = async (expense, userId) => {
     const prompt = parseExpensePrompt(expense.userDescription);
     const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt,
     });
-    const expenseObject = JSON.parse(
-        response.text
-            .replace(/```json/g, "")
-            .replace(/```/g, "")
-            .trim()
-    );
 
-    logger.info(
-        `[${newExpense._id}] AI response: ${JSON.stringify(expenseObject)}`
-    );
+    const expenseObject = parseAiJson(response.text);
 
     if (
         !expenseObject ||
@@ -38,13 +55,19 @@ const addExpense = async (expense, userId) => {
         !expenseObject.title ||
         !expenseObject.category
     ) {
-        throw new ApiError(status.BAD_REQUEST, "Invalid expense format");
+        throw new ApiError(
+            status.BAD_REQUEST,
+            "Invalid or incomplete AI response"
+        );
     }
 
-    newExpense.amount = expenseObject.amount;
-    newExpense.currency = expenseObject.currency;
-    newExpense.title = expenseObject.title;
+    logger.info(
+        `AI parsing successful for user: ${userId}. Extracted: ${JSON.stringify(
+            expenseObject
+        )}`
+    );
 
+    // Get or create category
     let category = await categoryService.getCategoryByName(
         expenseObject.category,
         userId
@@ -56,73 +79,62 @@ const addExpense = async (expense, userId) => {
         );
     }
 
-    newExpense.category = category._id;
-
-    const convertedAmount = await rateService.convertAmount(
-        expenseObject.amount,
-        expenseObject.currency
+    return _saveExpenseRecord(
+        {
+            ...expenseObject,
+            category: category._id,
+            userDescription: expense.userDescription,
+        },
+        userId
     );
-    newExpense.defaultCurrencyAmount = convertedAmount;
-    newExpense.defaultCurrency = "USD";
-
-    await newExpense.save();
-
-    const expenseWithCategory = await Expense.findById(newExpense._id).populate(
-        "category"
-    );
-
-    return expenseWithCategory;
 };
 
+/**
+ * Get all expenses for a user.
+ */
 const getExpenses = async (userId) => {
-    const expenses = await Expense.find({ userId })
+    return Expense.find({ userId })
         .populate("category")
         .sort({ createdAt: -1 });
-    return expenses;
 };
 
-const editExpense = async (expenseId, expense) => {
+/**
+ * Edit an existing expense.
+ */
+const editExpense = async (expenseId, updateData) => {
     const currentExpense = await Expense.findById(expenseId);
-    if (
-        currentExpense.amount !== expense.amount ||
-        currentExpense.currency !== expense.currency
-    ) {
-        const convertedAmount = await rateService.convertAmount(
-            expense.amount,
-            expense.currency
-        );
-        expense.defaultCurrencyAmount = convertedAmount;
-        await currentExpense.save();
+    if (!currentExpense) {
+        throw new ApiError(status.NOT_FOUND, "Expense not found");
     }
-    const updatedExpense = await Expense.findByIdAndUpdate(expenseId, expense, {
+
+    // Recalculate conversion if amount or currency changed
+    if (
+        currentExpense.amount !== updateData.amount ||
+        currentExpense.currency !== updateData.currency
+    ) {
+        updateData.defaultCurrencyAmount = await rateService.convertAmount(
+            updateData.amount,
+            updateData.currency
+        );
+    }
+
+    return Expense.findByIdAndUpdate(expenseId, updateData, {
         new: true,
     }).populate("category");
-    return updatedExpense;
 };
 
+/**
+ * Delete an expense.
+ */
 const deleteExpense = async (expenseId) => {
-    const deletedExpense = await Expense.findByIdAndDelete(expenseId);
-    return deletedExpense;
+    return Expense.findByIdAndDelete(expenseId);
 };
 
+/**
+ * Add an expense manually with pre-filled details.
+ */
 const addManualExpense = async (expenseData, userId) => {
-    const { title, amount, currency, category, createdAt } = expenseData;
-
-    const convertedAmount = await rateService.convertAmount(amount, currency);
-
-    const expense = await Expense.create({
-        title,
-        amount,
-        currency,
-        category,
-        userDescription: title,
-        userId,
-        defaultCurrencyAmount: convertedAmount,
-        defaultCurrency: "USD",
-        createdAt: createdAt,
-    });
-
-    return Expense.findById(expense._id).populate("category");
+    return _saveExpenseRecord(expenseData, userId);
 };
 
 module.exports = {
