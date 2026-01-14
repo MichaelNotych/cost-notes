@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
+import { toast } from '@/plugins/toast'
 
 export const useAuthStore = defineStore('auth', {
 	state: () => ({
@@ -50,6 +51,7 @@ export const useAuthStore = defineStore('auth', {
 				await axiosIns.post('/auth/logout')
 			} catch (error) {
 				console.error('Logout error:', error)
+				toast.error('Failed to logout smoothly, clearing session locally')
 			} finally {
 				// Clear local state regardless of API call result
 				this.setUser(null, null, null)

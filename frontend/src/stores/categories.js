@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
+import { toast } from '@/plugins/toast'
 
 export const useCategoriesStore = defineStore('categories', {
 	state: () => ({
@@ -35,10 +36,12 @@ export const useCategoriesStore = defineStore('categories', {
 			try {
 				const response = await axiosIns.post('/category', categoryData)
 				this.categories.push(response.data)
+				toast.success('Category added successfully')
 				return response.data
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add category'
+				toast.error(this.error)
 				throw err
 			}
 		},
@@ -57,10 +60,12 @@ export const useCategoriesStore = defineStore('categories', {
 				if (index !== -1) {
 					this.categories[index] = updatedCategory
 				}
+				toast.success('Category updated successfully')
 				return updatedCategory
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to update category'
+				toast.error(this.error)
 				throw err
 			}
 		},
@@ -74,9 +79,11 @@ export const useCategoriesStore = defineStore('categories', {
 			try {
 				await axiosIns.delete(`/category/${id}`)
 				this.categories = this.categories.filter((c) => c._id !== id)
+				toast.success('Category deleted successfully')
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to delete category'
+				toast.error(this.error)
 				throw err
 			}
 		},

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
+import { toast } from '@/plugins/toast'
 
 export const useExpensesStore = defineStore('expenses', {
 	state: () => ({
@@ -117,10 +118,12 @@ export const useExpensesStore = defineStore('expenses', {
 					userDescription: expenseData,
 				})
 				this.expenses.push(response.data)
+				toast.success('Expense added successfully')
 				return response.data
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add expense'
+				toast.error(this.error)
 				throw err
 			} finally {
 				this.isAddingExpense = false
@@ -137,10 +140,12 @@ export const useExpensesStore = defineStore('expenses', {
 			try {
 				const response = await axiosIns.post('/manual-expense', expenseData)
 				this.expenses.push(response.data)
+				toast.success('Expense added successfully')
 				return response.data
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add manual expense'
+				toast.error(this.error)
 				throw err
 			} finally {
 				this.isAddingExpense = false
@@ -161,10 +166,12 @@ export const useExpensesStore = defineStore('expenses', {
 				if (index !== -1) {
 					this.expenses[index] = updatedExpense
 				}
+				toast.success('Expense updated successfully')
 				return updatedExpense
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to update expense'
+				toast.error(this.error)
 				throw err
 			}
 		},
@@ -178,9 +185,11 @@ export const useExpensesStore = defineStore('expenses', {
 			try {
 				await axiosIns.delete(`/expense/${id}`)
 				this.expenses = this.expenses.filter((e) => e._id !== id)
+				toast.success('Expense deleted successfully')
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to delete expense'
+				toast.error(this.error)
 				throw err
 			}
 		},
