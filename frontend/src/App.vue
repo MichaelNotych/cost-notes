@@ -1,5 +1,6 @@
 <script setup>
 import AppHeader from './components/AppHeader.vue'
+import ToastContainer from './components/ToastContainer.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -11,6 +12,7 @@ const authStore = useAuthStore()
 			<RouterView />
 		</main>
 		<AppHeader v-if="authStore.isAuthenticated" />
+		<ToastContainer />
 	</div>
 </template>
 

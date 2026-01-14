@@ -11,6 +11,9 @@ import CloseIcon from '@/components/icons/CloseIcon.vue'
 import PencilIcon from '@/components/icons/PencilIcon.vue'
 import * as zod from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useToast } from '@/plugins/toast'
+
+const toast = useToast()
 
 const buttonVariants = ['primary', 'secondary', 'danger', 'ghost']
 
@@ -208,6 +211,38 @@ const handleFormSubmit = (values) => {
 						<PencilIcon />
 						<span class="text-[10px] text-zinc-500">PencilIcon</span>
 					</div>
+				</div>
+			</section>
+
+			<!-- Toasts Section -->
+			<section class="space-y-6">
+				<h2
+					class="text-xs font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2"
+				>
+					Toasts (Plugin)
+				</h2>
+				<div class="flex flex-wrap gap-4">
+					<AppButton
+						variant="secondary"
+						size="sm"
+						@click="toast.success('Successfully saved changes!')"
+					>
+						Success Toast
+					</AppButton>
+					<AppButton
+						variant="danger"
+						size="sm"
+						@click="toast.error('Failed to connect to server')"
+					>
+						Error Toast
+					</AppButton>
+					<AppButton
+						variant="ghost"
+						size="sm"
+						@click="toast.info('New updates available')"
+					>
+						Info Toast
+					</AppButton>
 				</div>
 			</section>
 		</div>
