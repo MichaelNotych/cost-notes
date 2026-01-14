@@ -62,13 +62,8 @@ const onDeleteCategory = async () => {
 		<div v-if="!isEditing" class="flex items-center gap-4 py-1 px-2">
 			<div class="text-center text-2xl">{{ category.emoji }}</div>
 			<div class="flex-1 text-lg font-medium text-gray-100">{{ category.name }}</div>
-			<AppButton
-				variant="secondary"
-				size="icon"
-				rounded="full"
-				@click="isEditing = true"
-			>
-				<PencilIcon  />
+			<AppButton variant="secondary" size="icon" rounded="full" @click="isEditing = true">
+				<PencilIcon />
 			</AppButton>
 		</div>
 
