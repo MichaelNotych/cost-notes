@@ -64,8 +64,11 @@ const initChart = () => {
 						color: 'rgba(63, 63, 70, 0.3)', // zinc-700
 					},
 					ticks: {
-						color: '#71717a', // zinc-500
-						callback: (value) => `$${value}`,
+						color: 'oklch(55.1% 0.027 264.364)', // gray-500
+						font: {
+							family: 'monospace',
+						},
+						callback: (value) => `${value}$`,
 					},
 				},
 				x: {
@@ -73,7 +76,7 @@ const initChart = () => {
 						display: false,
 					},
 					ticks: {
-						color: '#71717a', // zinc-500
+						color: 'oklch(55.1% 0.027 264.364)', // gray-500
 					},
 				},
 			},
@@ -114,7 +117,7 @@ const weeklyTotal = computed(() => {
 </script>
 
 <template>
-	<div class="bg-zinc-800/50 border border-zinc-700/50 rounded-2xl p-4 mb-6">
+	<div class="px-4 mb-6">
 		<div class="flex items-center gap-3 mb-4">
 			<AppTitle variant="subtitle" class="mr-auto">Weekly total:</AppTitle>
 			<AppButton
