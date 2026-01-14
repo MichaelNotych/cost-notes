@@ -10,14 +10,14 @@ defineProps({
 <template>
 	<svg
 		:class="`size-5 size-${size}`"
-		viewBox="0 0 24 24"
+		viewBox="0 0 12 12"
 		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		stroke-linecap="round"
-		stroke-linejoin="round"
+		xmlns="http://www.w3.org/2000/svg"
 	>
-		<line x1="18" y1="6" x2="6" y2="18"></line>
-		<line x1="6" y1="6" x2="18" y2="18"></line>
+		<path
+			transform="rotate(-45 6 6)"
+			d="M5.25048 11.25V0.75H6.75048V11.25H5.25048ZM0.750488 6.75V5.25H11.2505V6.75H0.750488Z"
+			fill="currentColor"
+		/>
 	</svg>
 </template>
