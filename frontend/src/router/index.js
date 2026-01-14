@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '../views/AuthView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
+import BrandKitView from '../views/BrandKitView.vue'
 
 import { useAuthStore } from '@/stores/auth'
 
@@ -24,6 +25,11 @@ const router = createRouter({
 			name: 'CategoriesView',
 			component: CategoriesView,
 			meta: { requiresAuth: true },
+		},
+		{
+			path: '/brand-kit',
+			name: 'BrandKitView',
+			component: BrandKitView,
 		},
 	],
 })
