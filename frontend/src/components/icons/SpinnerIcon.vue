@@ -1,6 +1,15 @@
+<script setup>
+defineProps({
+	size: {
+		type: String,
+		default: '5',
+	},
+})
+</script>
+
 <template>
 	<svg
-		:class="`animate-spin size-5 text-current`"
+		:class="`animate-spin size-5 size-${size} text-current`"
 		xmlns="http://www.w3.org/2000/svg"
 		fill="none"
 		viewBox="0 0 24 24"

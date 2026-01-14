@@ -1,7 +1,15 @@
+<script setup>
+defineProps({
+	size: {
+		type: String,
+		default: '5',
+	},
+})
+</script>
+
 <template>
 	<svg
-		width="24"
-		height="24"
+		:class="`size-5 size-${size}`"
 		viewBox="0 0 24 24"
 		fill="none"
 		stroke="currentColor"
