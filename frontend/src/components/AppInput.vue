@@ -20,13 +20,16 @@ const attrs = useAttrs()
 
 <template>
 	<div class="space-y-1.5 flex flex-col group">
-		<AppLabel v-if="label" :name="attrs.name" :label="label" />
+		<AppLabel
+			v-if="label"
+			:name="attrs.name"
+			:label="label"
+			:class="`${errorMessage ? 'text-red-400' : ''}`"
+		/>
 		<input
 			v-bind="attrs"
-			class="w-full bg-zinc-900/50 border border-zinc-700 rounded-md py-2.5 px-4 text-gray-300 placeholder:text-gray-600 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
-			:class="{
-				'border-red-500/50 focus:border-red-500 focus:ring-red-500/20': errorMessage,
-			}"
+			:class="`w-full bg-zinc-900/50 border  rounded-md py-2.5 px-4 text-gray-300 placeholder:text-gray-600 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all 
+				${errorMessage ? 'border-red-500/50' : 'border-zinc-700'}`"
 		/>
 		<Transition
 			enter-active-class="transition duration-200 ease-out"
