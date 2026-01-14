@@ -1,5 +1,5 @@
 <script setup>
-import AppHeader from './components/AppHeader.vue'
+import AppNavigation from './components/AppNavigation.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 		<main>
 			<RouterView />
 		</main>
-		<AppHeader v-if="authStore.isAuthenticated" />
+		<AppNavigation v-if="authStore.isAuthenticated" />
 		<ToastContainer />
 	</div>
 </template>

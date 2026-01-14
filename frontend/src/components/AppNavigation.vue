@@ -12,7 +12,7 @@ const menu = [
 </script>
 
 <template>
-	<header
+	<nav
 		class="fixed bottom-0 left-0 right-0 z-50 flex justify-center items-center gap-8 p-6 pb-10 bg-zinc-900 h-25"
 	>
 		<RouterLink
@@ -24,5 +24,5 @@ const menu = [
 		>
 			{{ item.name }}
 		</RouterLink>
-	</header>
+	</nav>
 </template>
