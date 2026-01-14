@@ -46,7 +46,7 @@ onMounted(async () => {
 
 <template>
 	<div class="flex flex-col flex-1 relative min-h-0">
-		<div class="flex-1 overflow-y-auto mb-40 scrollbar-hide">
+		<div class="flex-1 overflow-y-auto mb-30 scrollbar-hide">
 			<div
 				class="flex justify-center items-center py-8"
 				v-if="expensesStore.isLoadingExpenses"
@@ -82,11 +82,11 @@ onMounted(async () => {
 		<ManualExpenseDialog ref="manualDialog" />
 
 		<div
-			class="fixed bottom-25 left-0 right-0 p-4 pb-0 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
+			class="fixed bottom-0 left-0 right-0 p-4 pb-8 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
 		>
 			<form
 				@submit.prevent="handleSubmit"
-				class="flex gap-0 overflow-hidden rounded-full border border-zinc-700/30 max-w-xl mx-auto"
+				class="flex gap-0 overflow-hidden rounded-full border border-zinc-700/30"
 			>
 				<input
 					name="expense"
