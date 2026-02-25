@@ -1,6 +1,7 @@
 <script setup>
 import AppNavigation from './components/AppNavigation.vue'
 import ToastContainer from './components/ToastContainer.vue'
+import ReloadPrompt from './components/ReloadPrompt.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
@@ -13,6 +14,7 @@ const authStore = useAuthStore()
 		</main>
 		<AppNavigation v-if="authStore.isAuthenticated" />
 		<ToastContainer />
+		<ReloadPrompt />
 	</div>
 </template>
 

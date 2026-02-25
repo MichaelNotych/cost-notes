@@ -11,8 +11,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue(), vueDevTools(), tailwindcss(), VitePWA({
-    registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+    strategies: 'injectManifest',
+    srcDir: 'src',
+    filename: 'sw.js',
+    registerType: 'prompt',
+    devOptions: {
+      enabled: true,
+      type: 'module'
+    },
+    includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'CostNotes',
         short_name: 'CN',
