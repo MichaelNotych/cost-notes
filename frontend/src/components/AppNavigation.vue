@@ -8,6 +8,10 @@ const menu = [
 		name: 'Categories',
 		path: '/categories',
 	},
+	{
+		name: 'Weeks',
+		path: '/week',
+	},
 ]
 </script>
 

@@ -5,6 +5,7 @@ import CategoriesView from '../views/CategoriesView.vue'
 import BrandKitView from '../views/BrandKitView.vue'
 
 import { useAuthStore } from '@/stores/auth'
+import WeekView from '@/views/WeekView.vue'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,12 @@ const router = createRouter({
 			path: '/',
 			name: 'DashboardView',
 			component: DashboardView,
+			meta: { requiresAuth: true },
+		},
+		{
+			path: '/week',
+			name: 'WeekView',
+			component: WeekView,
 			meta: { requiresAuth: true },
 		},
 		{

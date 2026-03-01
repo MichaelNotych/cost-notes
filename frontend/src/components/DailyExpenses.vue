@@ -5,6 +5,7 @@ import AppButton from '@/components/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'
 import Card from './Card.vue'
+import DailyExpense from './DailyExpense.vue'
 
 const props = defineProps({
 	date: {
@@ -67,25 +68,9 @@ const formatAmount = (value) => {
 				<li
 					v-for="expense in expenses"
 					:key="expense._id"
-					class="flex items-center justify-between p-2 cursor-pointer border-b border-zinc-700/30 last:border-0"
 					@click="$emit('edit-expense', expense)"
 				>
-					<div class="flex items-center gap-2">
-						<span class="leading-none" role="img" aria-label="Category">
-							{{ expense.category?.emoji || '📝' }}
-						</span>
-						<span class="text-gray-400">
-							{{ expense.title || expense.userDescription }}
-						</span>
-					</div>
-					<div class="flex items-baseline gap-1">
-						<span class="font-mono text-gray-400">{{
-							formatAmount(expense.amount)
-						}}</span>
-						<span class="text-xs text-gray-400">
-							{{ getCurrencySymbolFromCode(expense.currency) }}
-						</span>
-					</div>
+					<DailyExpense :expense="expense" />
 				</li>
 			</ul>
 		</div>

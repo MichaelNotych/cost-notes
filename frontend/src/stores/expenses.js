@@ -86,6 +86,66 @@ export const useExpensesStore = defineStore('expenses', {
 
 			return groupsArray
 		},
+		/**
+		 * Group expenses by week (Monday to Sunday)
+		 * Returns an array of { id, name, categories, total }
+		 */
+		expensesByWeek: (state) => {
+			if (!state.expenses || state.expenses.length === 0) return []
+
+			const weeksMap = {}
+
+			state.expenses.forEach((expense) => {
+				const date = new Date(expense.createdAt)
+				// Get Monday of the week
+				const day = date.getDay()
+				const diff = date.getDate() - (day === 0 ? 6 : day - 1)
+				const monday = new Date(date)
+				monday.setDate(diff)
+				monday.setHours(0, 0, 0, 0)
+
+				const sunday = new Date(monday)
+				sunday.setDate(monday.getDate() + 6)
+				sunday.setHours(23, 59, 59, 999)
+
+				const weekKey = monday.toISOString().split('T')[0]
+
+				if (!weeksMap[weekKey]) {
+					weeksMap[weekKey] = {
+						id: weekKey,
+						name: `${monday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+						categories: {},
+						total: 0,
+						mondayDate: monday,
+					}
+				}
+
+				const categoryName =
+					typeof expense.category === 'object'
+						? expense.category.name || 'Uncategorized'
+						: 'Uncategorized'
+				const categoryEmoji =
+					typeof expense.category === 'object' ? expense.category.emoji || '📝' : '📝'
+
+				const categoryKey = `${categoryEmoji} ${categoryName}`
+				const amount = expense.defaultCurrencyAmount || 0
+
+				if (!weeksMap[weekKey].categories[categoryKey]) {
+					weeksMap[weekKey].categories[categoryKey] = 0
+				}
+				weeksMap[weekKey].categories[categoryKey] += amount
+				weeksMap[weekKey].total += amount
+			})
+
+			return Object.values(weeksMap)
+				.sort((a, b) => b.mondayDate - a.mondayDate)
+				.map(({ id, name, categories, total }) => ({
+					id,
+					name,
+					categories,
+					total,
+				}))
+		},
 	},
 
 	actions: {
