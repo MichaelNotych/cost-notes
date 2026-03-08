@@ -4,6 +4,7 @@ import getCurrencySymbolFromCode from '@/plugins/currencies'
 import AppButton from '@/components/atoms/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'
+import AppDate from '@/components/atoms/AppDate.vue'
 import Card from './Card.vue'
 import DailyExpense from './DailyExpense.vue'
 
@@ -19,10 +20,6 @@ const props = defineProps({
 })
 
 const dateObject = new Date(props.date)
-const dateString =
-	dateObject.getDate().toString().padStart(2, '0') +
-	' / ' +
-	(dateObject.getMonth() + 1).toString().padStart(2, '0')
 
 const dailyTotal = computed(() => {
 	return props.expenses.reduce((sum, expense) => {
@@ -47,7 +44,7 @@ const formatAmount = (value) => {
 <template>
 	<Card class="mb-1">
 		<header class="flex items-center gap-2 p-2 border-b border-zinc-700/30">
-			<AppTitle variant="subtitle" class="mr-auto">{{ dateString }}</AppTitle>
+			<AppDate :date="date" class="mr-auto" />
 			<AppButton
 				variant="secondary"
 				size="icon"

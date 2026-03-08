@@ -3,6 +3,7 @@ import { onMounted, ref, watch, onUnmounted, computed } from 'vue'
 import { Chart, registerables } from 'chart.js'
 import { useExpensesStore } from '@/stores/expenses'
 import AppTitle from './atoms/AppTitle.vue'
+import AppDate from './atoms/AppDate.vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
 import AppButton from './atoms/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
@@ -114,12 +115,22 @@ watch(
 const weeklyTotal = computed(() => {
 	return expensesStore.currentWeekDailyTotals.reduce((acc, curr) => acc + curr.value, 0)
 })
+
+const weekStartDate = computed(() => {
+	const totals = expensesStore.currentWeekDailyTotals
+	return totals && totals.length > 0 ? totals[0].date : null
+})
+
+const weekEndDate = computed(() => {
+	const totals = expensesStore.currentWeekDailyTotals
+	return totals && totals.length > 0 ? totals[totals.length - 1].date : null
+})
 </script>
 
 <template>
 	<div class="px-4 mb-6">
 		<div class="flex items-center gap-3 mb-4">
-			<AppTitle variant="subtitle" class="mr-auto">Weekly total:</AppTitle>
+			<AppDate :startDate="weekStartDate" :endDate="weekEndDate" class="mr-auto" />
 			<AppButton
 				variant="secondary"
 				size="icon"
