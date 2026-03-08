@@ -7,6 +7,8 @@ import AppDate from './atoms/AppDate.vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
 import AppButton from './atoms/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
+import ChevronLeftIcon from './icons/ChevronLeftIcon.vue'
+import ChevronRightIcon from './icons/ChevronRightIcon.vue'
 
 defineEmits(['add-manual-expense'])
 
@@ -130,7 +132,29 @@ const weekEndDate = computed(() => {
 <template>
 	<div class="px-4 mb-6">
 		<div class="flex items-center gap-3 mb-4">
-			<AppDate :startDate="weekStartDate" :endDate="weekEndDate" class="mr-auto" />
+			<div class="flex items-center gap-2 mr-auto">
+				<AppButton
+					variant="secondary"
+					size="icon"
+					rounded="full"
+					@click="expensesStore.prevWeek()"
+				>
+					<ChevronLeftIcon />
+				</AppButton>
+
+				<AppDate :startDate="weekStartDate" :endDate="weekEndDate" />
+
+				<AppButton
+					variant="secondary"
+					size="icon"
+					rounded="full"
+					@click="expensesStore.nextWeek()"
+					:disabled="expensesStore.currentWeekOffset >= 0"
+				>
+					<ChevronRightIcon />
+				</AppButton>
+			</div>
+
 			<AppButton
 				variant="secondary"
 				size="icon"

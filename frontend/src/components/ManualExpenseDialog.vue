@@ -17,7 +17,7 @@ const isWeekMode = ref(false)
 const selectedDate = ref('')
 const formRef = ref(null)
 
-const currencies = ['LAK', 'USD', 'EUR', 'GBP', 'UAH', 'PLN', 'TRY', 'THB']
+const currencies = ['VND', 'LAK', 'USD', 'EUR', 'GBP', 'UAH', 'PLN', 'TRY', 'THB']
 
 const schema = toTypedSchema(
 	zod.object({

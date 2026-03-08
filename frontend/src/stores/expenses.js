@@ -8,23 +8,36 @@ export const useExpensesStore = defineStore('expenses', {
 		error: null,
 		isAddingExpense: false,
 		isLoadingExpenses: false,
+		currentWeekOffset: 0,
 	}),
 
 	getters: {
 		/**
+		 * Start and end dates of the currently selected week
+		 */
+		selectedWeekRange: (state) => {
+			const today = new Date()
+			const currentDay = today.getDay() // 0 (Sun) to 6 (Sat)
+			const mondayDiff = currentDay === 0 ? -6 : 1 - currentDay
+			const monday = new Date(today)
+			monday.setDate(today.getDate() + mondayDiff + state.currentWeekOffset * 7)
+			monday.setHours(0, 0, 0, 0)
+
+			const sunday = new Date(monday)
+			sunday.setDate(monday.getDate() + 6)
+			sunday.setHours(23, 59, 59, 999)
+
+			return { monday, sunday }
+		},
+
+		/**
 		 * Total amounts per day for the current week (Monday to Sunday)
 		 * Returns an array of { label: string, value: number }
 		 */
-		currentWeekDailyTotals: (state) => {
+		currentWeekDailyTotals(state) {
 			if (!state.expenses) return []
 
-			const today = new Date()
-			const currentDay = today.getDay() // 0 (Sun) to 6 (Sat)
-			// Adjust so Monday is 0, Sunday is 6
-			const mondayDiff = currentDay === 0 ? -6 : 1 - currentDay
-			const monday = new Date(today)
-			monday.setDate(today.getDate() + mondayDiff)
-			monday.setHours(0, 0, 0, 0)
+			const { monday, sunday } = this.selectedWeekRange
 
 			const days = []
 			for (let i = 0; i < 7; i++) {
@@ -40,11 +53,14 @@ export const useExpensesStore = defineStore('expenses', {
 			state.expenses.forEach((expense) => {
 				const expenseDate = new Date(expense.createdAt)
 				expenseDate.setHours(0, 0, 0, 0)
-				const expenseDateString = expenseDate.toDateString()
 
-				const dayEntry = days.find((d) => d.date === expenseDateString)
-				if (dayEntry) {
-					dayEntry.value += expense.defaultCurrencyAmount || 0
+				if (expenseDate >= monday && expenseDate <= sunday) {
+					const expenseDateString = expenseDate.toDateString()
+
+					const dayEntry = days.find((d) => d.date === expenseDateString)
+					if (dayEntry) {
+						dayEntry.value += expense.defaultCurrencyAmount || 0
+					}
 				}
 			})
 
@@ -59,10 +75,17 @@ export const useExpensesStore = defineStore('expenses', {
 		 * Group expenses by date in descending order
 		 * Returns an array of { date: string, items: Expense[] }
 		 */
-		groupedExpenses: (state) => {
+		groupedExpenses(state) {
 			if (!state.expenses) return []
 
-			const sortedExpenses = [...state.expenses].sort(
+			const { monday, sunday } = this.selectedWeekRange
+
+			const filteredExpenses = state.expenses.filter((expense) => {
+				const d = new Date(expense.createdAt)
+				return d >= monday && d <= sunday
+			})
+
+			const sortedExpenses = [...filteredExpenses].sort(
 				(a, b) => new Date(b.createdAt) - new Date(a.createdAt),
 			)
 
@@ -149,6 +172,14 @@ export const useExpensesStore = defineStore('expenses', {
 	},
 
 	actions: {
+		prevWeek() {
+			this.currentWeekOffset -= 1
+		},
+		nextWeek() {
+			if (this.currentWeekOffset < 0) {
+				this.currentWeekOffset += 1
+			}
+		},
 		/**
 		 * Fetch all user expenses
 		 */
