@@ -46,7 +46,7 @@ onMounted(async () => {
 
 <template>
 	<div class="flex flex-col flex-1 relative min-h-0">
-		<div class="flex-1 overflow-y-auto mb-40 scrollbar-hide">
+		<div class="flex-1 overflow-y-auto scrollbar-hide">
 			<div
 				class="flex justify-center items-center py-8"
 				v-if="expensesStore.isLoadingExpenses"
