@@ -9,6 +9,7 @@ export const useExpensesStore = defineStore('expenses', {
 		isAddingExpense: false,
 		isLoadingExpenses: false,
 		currentWeekOffset: 0,
+		loadedWeeks: 0,
 	}),
 
 	getters: {
@@ -174,21 +175,33 @@ export const useExpensesStore = defineStore('expenses', {
 	actions: {
 		prevWeek() {
 			this.currentWeekOffset -= 1
+			this.fetchExpenses()
 		},
 		nextWeek() {
 			if (this.currentWeekOffset < 0) {
 				this.currentWeekOffset += 1
+				this.fetchExpenses()
 			}
 		},
 		/**
 		 * Fetch all user expenses
 		 */
 		async fetchExpenses() {
+			const requiredWeeks = Math.abs(this.currentWeekOffset) + 1
+			if (this.loadedWeeks >= requiredWeeks) {
+				return
+			}
+
 			this.error = null
 			this.isLoadingExpenses = true
 			try {
-				const response = await axiosIns.get('/expenses')
+				const response = await axiosIns.get('/expenses', {
+					params: {
+						period: `${requiredWeeks}w`,
+					},
+				})
 				this.expenses = response.data
+				this.loadedWeeks = requiredWeeks
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to fetch expenses'
