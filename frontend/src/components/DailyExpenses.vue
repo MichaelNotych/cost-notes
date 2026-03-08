@@ -19,8 +19,6 @@ const props = defineProps({
 	},
 })
 
-const dateObject = new Date(props.date)
-
 const dailyTotal = computed(() => {
 	return props.expenses.reduce((sum, expense) => {
 		return sum + (parseFloat(expense.defaultCurrencyAmount) || 0)

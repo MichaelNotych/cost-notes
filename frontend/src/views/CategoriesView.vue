@@ -7,7 +7,6 @@ import CategoryItem from '@/components/CategoryItem.vue'
 import AppForm from '@/components/AppForm.vue'
 import AppButton from '@/components/atoms/AppButton.vue'
 import SpinnerIcon from '@/components/icons/SpinnerIcon.vue'
-import AppTitle from '@/components/atoms/AppTitle.vue'
 import Card from '@/components/Card.vue'
 
 const categoriesStore = useCategoriesStore()
