@@ -4,7 +4,7 @@ import { Chart, registerables } from 'chart.js'
 import { useExpensesStore } from '@/stores/expenses'
 import AppTitle from './atoms/AppTitle.vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
-import AppButton from './AppButton.vue'
+import AppButton from './atoms/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 
 defineEmits(['add-manual-expense'])

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { useCategoriesStore } from '@/stores/categories'
-import AppButton from '@/components/AppButton.vue'
+import AppButton from '@/components/atoms/AppButton.vue'
 import AppForm from '@/components/AppForm.vue'
 import PencilIcon from '@/components/icons/PencilIcon.vue'
 

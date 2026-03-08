@@ -1,6 +1,6 @@
 <script setup>
-import AppButton from '@/components/AppButton.vue'
-import AppInput from '@/components/AppInput.vue'
+import AppButton from '@/components/atoms/AppButton.vue'
+import AppInput from '@/components/atoms/AppInput.vue'
 import AppForm from '@/components/AppForm.vue'
 import Card from '@/components/Card.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'

@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 import { Form, Field } from 'vee-validate'
-import AppButton from '@/components/AppButton.vue'
-import AppInput from '@/components/AppInput.vue'
+import AppButton from '@/components/atoms/AppButton.vue'
+import AppInput from '@/components/atoms/AppInput.vue'
 
 const props = defineProps({
 	fields: {

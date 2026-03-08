@@ -4,7 +4,7 @@ import { useExpensesStore } from '@/stores/expenses'
 import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
 import ManualExpenseDialog from '@/components/ManualExpenseDialog.vue'
-import AppButton from '@/components/AppButton.vue'
+import AppButton from '@/components/atoms/AppButton.vue'
 import WeeklyChart from '@/components/WeeklyChart.vue'
 
 const expensesStore = useExpensesStore()

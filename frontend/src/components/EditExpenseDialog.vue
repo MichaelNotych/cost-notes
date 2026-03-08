@@ -4,7 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import { useCategoriesStore } from '@/stores/categories'
 import AppForm from '@/components/AppForm.vue'
-import AppButton from './AppButton.vue'
+import AppButton from './atoms/AppButton.vue'
 import CloseIcon from './icons/CloseIcon.vue'
 import AppTitle from './atoms/AppTitle.vue'
 

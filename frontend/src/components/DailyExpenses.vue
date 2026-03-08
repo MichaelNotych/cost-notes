@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
-import AppButton from '@/components/AppButton.vue'
+import AppButton from '@/components/atoms/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'
 import Card from './Card.vue'
