@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '../views/AuthView.vue'
-import DashboardView from '../views/DashboardView.vue'
+import ExpensesView from '../views/ExpensesView.vue'
 import CategoriesView from '../views/CategoriesView.vue'
 import BrandKitView from '../views/BrandKitView.vue'
 
@@ -17,8 +17,8 @@ const router = createRouter({
 		},
 		{
 			path: '/',
-			name: 'DashboardView',
-			component: DashboardView,
+			name: 'ExpensesView',
+			component: ExpensesView,
 			meta: { requiresAuth: true },
 		},
 		{
