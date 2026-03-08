@@ -92,8 +92,31 @@ const addExpense = async (expense, userId) => {
 /**
  * Get all expenses for a user.
  */
-const getExpenses = async (userId) => {
-    return Expense.find({ userId })
+const getExpenses = async (userId, period) => {
+    const query = { userId };
+    
+    if (period) {
+        const match = period.match(/^(\d+)([dwmy])$/);
+        if (match) {
+            const value = parseInt(match[1]);
+            const unit = match[2];
+            const startDate = new Date();
+            
+            if (unit === 'd') {
+                startDate.setDate(startDate.getDate() - value);
+            } else if (unit === 'w') {
+                startDate.setDate(startDate.getDate() - (value * 7));
+            } else if (unit === 'm') {
+                startDate.setMonth(startDate.getMonth() - value);
+            } else if (unit === 'y') {
+                startDate.setFullYear(startDate.getFullYear() - value);
+            }
+            
+            query.createdAt = { $gte: startDate };
+        }
+    }
+
+    return Expense.find(query)
         .populate("category")
         .sort({ createdAt: -1 });
 };

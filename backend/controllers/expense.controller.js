@@ -19,7 +19,8 @@ const deleteExpense = catchAsync(async (req, res) => {
 });
 
 const getExpenses = catchAsync(async (req, res) => {
-    const expenses = await expenseService.getExpenses(req.userId);
+    const { period } = req.query;
+    const expenses = await expenseService.getExpenses(req.userId, period);
     res.status(status.OK).json(expenses);
 });
 
