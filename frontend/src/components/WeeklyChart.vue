@@ -130,7 +130,7 @@ const weekEndDate = computed(() => {
 </script>
 
 <template>
-	<div class="px-4 mb-6">
+	<div class="mb-6">
 		<div class="flex items-center gap-3 mb-4">
 			<div class="flex items-center gap-2 mr-auto">
 				<AppButton
@@ -142,7 +142,7 @@ const weekEndDate = computed(() => {
 					<ChevronLeftIcon />
 				</AppButton>
 
-				<AppDate :startDate="weekStartDate" :endDate="weekEndDate" />
+				<AppDate :startDate="weekStartDate" :endDate="weekEndDate" variant="small" />
 
 				<AppButton
 					variant="secondary"

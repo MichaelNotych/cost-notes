@@ -41,7 +41,7 @@ const variantClasses = {
 const sizeClasses = {
 	sm: 'py-2 px-4 text-sm',
 	md: 'py-2.5 px-6 text-base',
-	icon: 'w-8 h-8 opacity-70 [&>svg]:size-3',
+	icon: 'w-6 h-6 opacity-70 [&>svg]:size-3',
 }
 
 const classes = computed(() => {
