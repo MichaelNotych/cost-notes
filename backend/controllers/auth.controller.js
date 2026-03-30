@@ -32,7 +32,10 @@ const refreshTokens = catchAsync(async (req, res) => {
 });
 
 const logout = catchAsync(async (req, res) => {
-	await tokenService.revokeRefreshToken(req.userId);
+	const refreshToken = req.body.refreshToken;
+	if (refreshToken) {
+		await tokenService.revokeRefreshToken(refreshToken);
+	}
 	res.status(status.NO_CONTENT).send();
 });
 

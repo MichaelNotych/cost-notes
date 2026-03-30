@@ -126,8 +126,8 @@ const refreshAuthTokens = async (refreshToken) => {
 /**
  * Revoke refresh token (for logout)
  */
-const revokeRefreshToken = async (userId) => {
-	await Token.deleteMany({ userId });
+const revokeRefreshToken = async (refreshToken) => {
+	await Token.deleteMany({ token: refreshToken });
 };
 
 module.exports = {

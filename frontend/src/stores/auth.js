@@ -48,7 +48,9 @@ export const useAuthStore = defineStore('auth', {
 		async logout() {
 			try {
 				// Call backend logout endpoint to revoke refresh token
-				await axiosIns.post('/auth/logout')
+				await axiosIns.post('/auth/logout', {
+					refreshToken: localStorage.getItem('cn_refresh_token'),
+				})
 			} catch (error) {
 				console.error('Logout error:', error)
 				toast.error('Failed to logout smoothly, clearing session locally')
