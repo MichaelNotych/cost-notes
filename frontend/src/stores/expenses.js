@@ -10,6 +10,10 @@ export const useExpensesStore = defineStore('expenses', {
 		isLoadingExpenses: false,
 		currentWeekOffset: 0,
 		loadedWeeks: 0,
+		totalPages: 1,
+		currentPage: 1,
+		calendarExpenses: [],
+		isLoadingCalendar: false,
 	}),
 
 	getters: {
@@ -170,6 +174,63 @@ export const useExpensesStore = defineStore('expenses', {
 					total,
 				}))
 		},
+
+		/**
+		 * Group expenses by month
+		 * Returns an array of { id, name, categories, total }
+		 */
+		expensesByMonth: (state) => {
+			if (!state.expenses || state.expenses.length === 0) return []
+
+			const monthsMap = {}
+
+			state.expenses.forEach((expense) => {
+				const date = new Date(expense.createdAt)
+				const month = date.getMonth()
+				const year = date.getFullYear()
+
+				const monthDate = new Date(year, month, 1)
+				const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`
+
+				if (!monthsMap[monthKey]) {
+					monthsMap[monthKey] = {
+						id: monthKey,
+						name: monthDate.toLocaleDateString(undefined, {
+							month: 'long',
+							year: 'numeric',
+						}),
+						categories: {},
+						total: 0,
+						monthDate: monthDate,
+					}
+				}
+
+				const categoryName =
+					typeof expense.category === 'object'
+						? expense.category.name || 'Uncategorized'
+						: 'Uncategorized'
+				const categoryEmoji =
+					typeof expense.category === 'object' ? expense.category.emoji || '📝' : '📝'
+
+				const categoryKey = `${categoryEmoji} ${categoryName}`
+				const amount = expense.defaultCurrencyAmount || 0
+
+				if (!monthsMap[monthKey].categories[categoryKey]) {
+					monthsMap[monthKey].categories[categoryKey] = 0
+				}
+				monthsMap[monthKey].categories[categoryKey] += amount
+				monthsMap[monthKey].total += amount
+			})
+
+			return Object.values(monthsMap)
+				.sort((a, b) => b.monthDate - a.monthDate)
+				.map(({ id, name, categories, total }) => ({
+					id,
+					name,
+					categories,
+					total,
+				}))
+		},
 	},
 
 	actions: {
@@ -184,7 +245,7 @@ export const useExpensesStore = defineStore('expenses', {
 			}
 		},
 		/**
-		 * Fetch all user expenses
+		 * Fetch user expenses
 		 */
 		async fetchExpenses() {
 			const requiredWeeks = Math.abs(this.currentWeekOffset) + 1
@@ -200,8 +261,28 @@ export const useExpensesStore = defineStore('expenses', {
 						period: `${requiredWeeks}w`,
 					},
 				})
-				this.expenses = response.data
+				this.expenses = response.data.expenses
+				this.totalPages = response.data.totalPages
+				this.currentPage = response.data.currentPage
 				this.loadedWeeks = requiredWeeks
+			} catch (err) {
+				console.error(err)
+				this.error = err.response?.data?.message || 'Failed to fetch expenses'
+			} finally {
+				this.isLoadingExpenses = false
+			}
+		},
+
+		async fetchAllExpenses(page = 1) {
+			this.error = null
+			this.isLoadingExpenses = true
+			try {
+				const response = await axiosIns.get('/expenses', {
+					params: { page },
+				})
+				this.expenses = response.data.expenses
+				this.totalPages = response.data.totalPages
+				this.currentPage = response.data.currentPage
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to fetch expenses'
@@ -277,6 +358,34 @@ export const useExpensesStore = defineStore('expenses', {
 				this.error = err.response?.data?.message || 'Failed to update expense'
 				toast.error(this.error)
 				throw err
+			}
+		},
+
+		async fetchCalendarExpenses(startDate, endDate) {
+			this.isLoadingCalendar = true
+			try {
+				const response = await axiosIns.get('/expenses', {
+					params: { startDate, endDate, limit: 2000 },
+				})
+				this.calendarExpenses = response.data.expenses
+			} catch (err) {
+				console.error(err)
+				this.error = err.response?.data?.message || 'Failed to fetch calendar expenses'
+			} finally {
+				this.isLoadingCalendar = false
+			}
+		},
+
+		async appendCalendarExpenses(startDate, endDate) {
+			try {
+				const response = await axiosIns.get('/expenses', {
+					params: { startDate, endDate, limit: 2000 },
+				})
+				this.calendarExpenses.push(...response.data.expenses)
+				return response.data.expenses.length
+			} catch (err) {
+				console.error(err)
+				return 0
 			}
 		},
 

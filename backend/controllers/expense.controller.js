@@ -19,9 +19,15 @@ const deleteExpense = catchAsync(async (req, res) => {
 });
 
 const getExpenses = catchAsync(async (req, res) => {
-    const { period } = req.query;
-    const expenses = await expenseService.getExpenses(req.userId, period);
-    res.status(status.OK).json(expenses);
+    const { period, page, startDate, endDate, limit } = req.query;
+    const result = await expenseService.getExpenses(req.userId, {
+        period,
+        page: parseInt(page) || 1,
+        startDate,
+        endDate,
+        limit: limit ? parseInt(limit) : undefined,
+    });
+    res.status(status.OK).json(result);
 });
 
 const addManualExpense = catchAsync(async (req, res) => {

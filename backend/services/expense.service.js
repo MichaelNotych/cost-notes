@@ -90,35 +90,53 @@ const addExpense = async (expense, userId) => {
 };
 
 /**
- * Get all expenses for a user.
+ * Get all expenses for a user with pagination.
  */
-const getExpenses = async (userId, period) => {
+const getExpenses = async (userId, { period, page = 1, limit = 100, startDate, endDate } = {}) => {
     const query = { userId };
-    
-    if (period) {
+
+    if (startDate || endDate) {
+        query.createdAt = {};
+        if (startDate) query.createdAt.$gte = new Date(startDate);
+        if (endDate) query.createdAt.$lte = new Date(endDate);
+    } else if (period) {
         const match = period.match(/^(\d+)([dwmy])$/);
         if (match) {
             const value = parseInt(match[1]);
             const unit = match[2];
-            const startDate = new Date();
-            
+            const periodStart = new Date();
+
             if (unit === 'd') {
-                startDate.setDate(startDate.getDate() - value);
+                periodStart.setDate(periodStart.getDate() - value);
             } else if (unit === 'w') {
-                startDate.setDate(startDate.getDate() - (value * 7));
+                periodStart.setDate(periodStart.getDate() - (value * 7));
             } else if (unit === 'm') {
-                startDate.setMonth(startDate.getMonth() - value);
+                periodStart.setMonth(periodStart.getMonth() - value);
             } else if (unit === 'y') {
-                startDate.setFullYear(startDate.getFullYear() - value);
+                periodStart.setFullYear(periodStart.getFullYear() - value);
             }
-            
-            query.createdAt = { $gte: startDate };
+
+            query.createdAt = { $gte: periodStart };
         }
     }
 
-    return Expense.find(query)
-        .populate("category")
-        .sort({ createdAt: -1 });
+    const skip = (page - 1) * limit;
+
+    const [expenses, totalExpenses] = await Promise.all([
+        Expense.find(query)
+            .populate("category")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit),
+        Expense.countDocuments(query)
+    ]);
+
+    return {
+        expenses,
+        totalPages: Math.ceil(totalExpenses / limit),
+        currentPage: parseInt(page),
+        totalExpenses
+    };
 };
 
 /**
