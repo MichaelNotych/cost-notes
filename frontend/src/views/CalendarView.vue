@@ -1,8 +1,13 @@
 <script setup>
 import { onMounted, onUnmounted, computed, ref, nextTick } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
+import { useHeatmapIntensity } from '@/composables/useHeatmapIntensity'
+import DailyExpense from '@/components/DailyExpense.vue'
+import AppButton from '@/components/atoms/AppButton.vue'
+import CloseIcon from '@/components/icons/CloseIcon.vue'
 
 const expensesStore = useExpensesStore()
+const { intensityClass: _intensityClass, fmtCompact } = useHeatmapIntensity()
 
 const displayedMonths = ref([]) // [{year, month}], newest first
 const isLoadingMore = ref(false)
@@ -51,6 +56,7 @@ const monthsData = computed(() =>
 
 			weekDays.push({
 				day,
+				key,
 				amount,
 				isToday:
 					today.getFullYear() === year &&
@@ -83,30 +89,41 @@ const monthsData = computed(() =>
 	}),
 )
 
-const intensityClass = (amount, isFuture) => {
-	if (isFuture) return 'bg-white/5'
-	if (!amount) return 'bg-white/5'
-	const max = maxDailyAmount.value
-	if (!max) return 'bg-white/5'
-	const r = amount / max
-	if (r <= 0.15) return 'bg-sky-950'
-	if (r <= 0.35) return 'bg-sky-900'
-	if (r <= 0.55) return 'bg-sky-800'
-	if (r <= 0.75) return 'bg-sky-700'
-	if (r <= 0.9) return 'bg-sky-600'
-	return 'bg-sky-400'
-}
+const intensityClass = (amount, isFuture) => _intensityClass(amount, isFuture, maxDailyAmount.value)
 
 const fmt = (value) => {
 	if (!value) return '0'
 	return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-const fmtCompact = (value) => {
-	if (!value) return ''
-	if (value >= 10000) return `${(value / 1000).toFixed(0)}k`
-	if (value >= 1000) return `${(value / 1000).toFixed(1)}k`
-	return value.toFixed(0)
+const selectedDayKey = ref(null)
+
+const selectedDayExpenses = computed(() => {
+	if (!selectedDayKey.value) return []
+	return expensesStore.calendarExpenses.filter((e) => {
+		const d = new Date(e.createdAt)
+		const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+		return k === selectedDayKey.value
+	})
+})
+
+const selectedDayTotal = computed(() =>
+	selectedDayExpenses.value.reduce((s, e) => s + (e.defaultCurrencyAmount || 0), 0),
+)
+
+const selectedDayLabel = computed(() => {
+	if (!selectedDayKey.value) return ''
+	const [y, mo, d] = selectedDayKey.value.split('-').map(Number)
+	return new Date(y, mo - 1, d).toLocaleDateString(undefined, {
+		weekday: 'long',
+		month: 'long',
+		day: 'numeric',
+	})
+})
+
+const openDay = (day) => {
+	if (!day || day.isFuture) return
+	selectedDayKey.value = day.key
 }
 
 const buildMonthsList = (count, fromYear, fromMonth) =>
@@ -240,9 +257,11 @@ onUnmounted(() => {
 								v-for="(day, di) in week.days"
 								:key="di"
 								class="flex-1 aspect-square rounded-xl mx-0.5 transition-colors relative"
-								:class="
-									day ? intensityClass(day.amount, day.isFuture) : 'invisible'
-								"
+								:class="[
+									day ? intensityClass(day.amount, day.isFuture) : 'invisible',
+									day && !day.isFuture ? 'cursor-pointer active:scale-90' : '',
+								]"
+								@click="openDay(day)"
 							>
 								<div
 									v-if="day?.isToday"
@@ -271,6 +290,69 @@ onUnmounted(() => {
 				</div>
 			</div>
 		</template>
+
+		<!-- Day detail popup -->
+		<Transition
+			enter-active-class="transition duration-200 ease-out"
+			enter-from-class="opacity-0"
+			enter-to-class="opacity-100"
+			leave-active-class="transition duration-150 ease-in"
+			leave-from-class="opacity-100"
+			leave-to-class="opacity-0"
+		>
+			<div
+				v-if="selectedDayKey"
+				class="fixed inset-x-0 top-0 bottom-25 z-[60] flex items-end justify-center bg-zinc-950/70 backdrop-blur-sm"
+				@click.self="selectedDayKey = null"
+			>
+				<Transition
+					enter-active-class="transition duration-200 ease-out"
+					enter-from-class="translate-y-4 opacity-0"
+					enter-to-class="translate-y-0 opacity-100"
+					leave-active-class="transition duration-150 ease-in"
+					leave-from-class="translate-y-0 opacity-100"
+					leave-to-class="translate-y-4 opacity-0"
+				>
+					<div
+						v-if="selectedDayKey"
+						class="w-full max-w-lg bg-zinc-900 rounded-t-2xl border-t border-x border-none overflow-hidden"
+						@click.stop
+					>
+						<header
+							class="flex items-center justify-between px-4 py-3 border-b border-zinc-700"
+						>
+							<div>
+								<p class="font-semibold text-white text-sm">
+									{{ selectedDayLabel }}
+								</p>
+								<p class="text-xs text-sky-400 font-mono mt-0.5">
+									{{ fmt(selectedDayTotal) }} {{ defaultCurrency }}
+								</p>
+							</div>
+							<AppButton
+								variant="secondary"
+								size="icon"
+								rounded="full"
+								@click="selectedDayKey = null"
+							>
+								<CloseIcon />
+							</AppButton>
+						</header>
+
+						<div class="overflow-y-auto max-h-72 px-2 py-1">
+							<template v-if="selectedDayExpenses.length > 0">
+								<DailyExpense
+									v-for="expense in selectedDayExpenses"
+									:key="expense._id"
+									:expense="expense"
+								/>
+							</template>
+							<p v-else class="text-center text-zinc-500 text-sm py-6">No expenses</p>
+						</div>
+					</div>
+				</Transition>
+			</div>
+		</Transition>
 	</div>
 </template>
 

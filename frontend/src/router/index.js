@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '../views/AuthView.vue'
 import ExpensesView from '../views/ExpensesView.vue'
-import CategoriesView from '../views/CategoriesView.vue'
 import BrandKitView from '../views/BrandKitView.vue'
 
 import { useAuthStore } from '@/stores/auth'
 import WeekView from '@/views/WeekView.vue'
+import CalendarView from '@/views/CalendarView.vue'
+import SettingsView from '@/views/SettingsView.vue'
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,9 +29,15 @@ const router = createRouter({
 			meta: { requiresAuth: true },
 		},
 		{
-			path: '/categories',
-			name: 'CategoriesView',
-			component: CategoriesView,
+			path: '/calendar',
+			name: 'CalendarView',
+			component: CalendarView,
+			meta: { requiresAuth: true },
+		},
+		{
+			path: '/settings',
+			name: 'SettingsView',
+			component: SettingsView,
 			meta: { requiresAuth: true },
 		},
 		{

@@ -49,6 +49,7 @@ const onAddCategory = async (values, { resetForm }) => {
 </script>
 
 <template>
+	<h1 class="text-2xl font-bold">Settings</h1>
 	<div class="space-y-4">
 		<div v-if="categoriesStore.loading" class="h-30 flex items-center justify-center">
 			<SpinnerIcon />

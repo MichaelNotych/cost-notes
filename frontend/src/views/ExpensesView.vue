@@ -5,7 +5,7 @@ import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
 import ManualExpenseDialog from '@/components/ManualExpenseDialog.vue'
 import AppButton from '@/components/atoms/AppButton.vue'
-import WeeklyChart from '@/components/WeeklyChart.vue'
+import WeekHeatmap from '@/components/WeekHeatmap.vue'
 
 const expensesStore = useExpensesStore()
 
@@ -57,7 +57,7 @@ onMounted(async () => {
 			</div>
 
 			<template v-else>
-				<WeeklyChart @add-manual-expense="handleAddManual" />
+				<WeekHeatmap @add-manual-expense="handleAddManual" />
 
 				<DailyExpenses
 					v-for="group in expensesStore.groupedExpenses"
