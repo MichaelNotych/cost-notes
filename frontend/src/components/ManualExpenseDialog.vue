@@ -144,8 +144,10 @@ defineExpose({ open })
 					<header class="flex items-center justify-between px-5 py-2">
 						<button
 							@click="
-								isAiMode = !isAiMode
-								localStorage.setItem(LAST_MODE_KEY, isAiMode ? 'ai' : 'manual')
+								() => {
+									isAiMode = !isAiMode
+									localStorage.setItem(LAST_MODE_KEY, isAiMode ? 'ai' : 'manual')
+								}
 							"
 							class="p-2 -ml-2 transition-colors"
 							:class="isAiMode ? 'text-sky-400' : 'text-zinc-400 hover:text-white'"
