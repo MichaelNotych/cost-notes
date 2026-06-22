@@ -3,7 +3,8 @@ import { ref, computed } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import { useCategoriesStore } from '@/stores/categories'
 import CloseIcon from './icons/CloseIcon.vue'
-import SpinnerIcon from './icons/SpinnerIcon.vue'
+import AppInput from '@/components/atoms/AppInput.vue'
+import AppButton from '@/components/atoms/AppButton.vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
 
 const expensesStore = useExpensesStore()
@@ -164,46 +165,23 @@ defineExpose({ open })
 
 					<!-- Note field -->
 					<div class="mx-4 mb-3">
-						<div class="flex items-center gap-3 bg-zinc-800 rounded-2xl px-4 py-3">
-							<svg
-								class="w-4 h-4 text-zinc-500 shrink-0"
-								viewBox="0 0 16 16"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="1.5"
-								stroke-linecap="round"
-							>
-								<path d="M2 4h12M2 8h12M2 12h7" />
-							</svg>
-							<input
-								v-model="note"
-								type="text"
-								placeholder="Title"
-								class="bg-transparent text-gray-300 placeholder-zinc-600 focus:outline-none w-full text-base"
-							/>
-						</div>
+						<AppInput
+							:value="note"
+							@input="note = $event.target.value"
+							type="text"
+							placeholder="Title"
+							class="text-base"
+						/>
 					</div>
 
 					<!-- Date field -->
 					<div class="mx-4 mb-3">
-						<div class="flex items-center gap-3 bg-zinc-800 rounded-2xl px-4 py-3">
-							<svg
-								class="w-4 h-4 text-zinc-500 shrink-0"
-								viewBox="0 0 16 16"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="1.5"
-								stroke-linecap="round"
-							>
-								<rect x="2" y="3" width="12" height="11" rx="1.5" />
-								<path d="M5 1.5v3M11 1.5v3M2 7.5h12" />
-							</svg>
-							<input
-								v-model="selectedDateStr"
-								type="date"
-								class="bg-transparent text-gray-300 focus:outline-none w-full text-base"
-							/>
-						</div>
+						<AppInput
+							:value="selectedDateStr"
+							@change="selectedDateStr = $event.target.value"
+							type="date"
+							class="text-base [color-scheme:dark]"
+						/>
 					</div>
 
 					<!-- Category chips -->
@@ -268,25 +246,16 @@ defineExpose({ open })
 
 					<!-- Save button -->
 					<div class="px-4 pb-10">
-						<button
+						<AppButton
+							variant="primary"
+							:disabled="!canSave"
+							:loading="isSubmitting"
+							rounded="2xl"
+							class="w-full !py-4 font-semibold"
 							@click="handleSave"
-							:disabled="!canSave || isSubmitting"
-							class="w-full py-4 rounded-2xl font-semibold text-base transition-colors"
-							:class="
-								canSave && !isSubmitting
-									? 'bg-sky-600 hover:bg-sky-500 active:bg-sky-700 text-white'
-									: 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-							"
 						>
-							<span
-								v-if="isSubmitting"
-								class="flex items-center justify-center gap-2"
-							>
-								<SpinnerIcon />
-								Saving...
-							</span>
-							<span v-else>Save</span>
-						</button>
+							Save
+						</AppButton>
 					</div>
 				</div>
 			</div>
