@@ -23,7 +23,7 @@ const props = defineProps({
 	size: {
 		type: String,
 		default: 'md',
-		validator: (value) => ['sm', 'md', 'icon'].includes(value),
+		validator: (value) => ['sm', 'md', 'xl', 'icon'].includes(value),
 	},
 	rounded: {
 		type: String,
@@ -41,6 +41,7 @@ const variantClasses = {
 const sizeClasses = {
 	sm: 'py-2 px-4 text-sm',
 	md: 'py-2.5 px-6 text-base',
+	xl: 'py-4 px-6 text-2xl',
 	icon: 'w-6 h-6 opacity-70 [&>svg]:size-3',
 }
 

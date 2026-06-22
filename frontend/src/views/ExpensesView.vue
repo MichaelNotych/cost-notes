@@ -4,24 +4,12 @@ import { useExpensesStore } from '@/stores/expenses'
 import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
 import ManualExpenseDialog from '@/components/ManualExpenseDialog.vue'
-import AppButton from '@/components/atoms/AppButton.vue'
 import WeekHeatmap from '@/components/WeekHeatmap.vue'
 
 const expensesStore = useExpensesStore()
 
-const expense = ref('')
 const editDialog = ref(null)
 const manualDialog = ref(null)
-
-const handleSubmit = async () => {
-	window.scrollTo({ top: 0, behavior: 'smooth' })
-	try {
-		await expensesStore.addExpense(expense.value)
-		expense.value = ''
-	} catch (err) {
-		console.error('Failed to add expense:', err)
-	}
-}
 
 const handleEdit = (expense) => {
 	editDialog.value.open(expense)
@@ -80,33 +68,6 @@ onMounted(async () => {
 
 		<EditExpenseDialog ref="editDialog" @save="handleSave" />
 		<ManualExpenseDialog ref="manualDialog" />
-
-		<div
-			class="fixed bottom-25 left-0 right-0 p-4 pb-0 bg-zinc-900 rounded-tl-4xl rounded-tr-4xl z-10"
-		>
-			<form
-				@submit.prevent="handleSubmit"
-				class="flex gap-0 overflow-hidden rounded-full border border-zinc-700/30 max-w-xl mx-auto"
-			>
-				<input
-					name="expense"
-					type="text"
-					placeholder="Enter your expense"
-					autocomplete="off"
-					v-model="expense"
-					class="flex-1 bg-transparent border-none py-3 px-4 text-gray-100 placeholder-gray-400 focus:ring-0 outline-none"
-				/>
-				<AppButton
-					type="submit"
-					variant="primary"
-					rounded="none"
-					:loading="expensesStore.isAddingExpense"
-					:disabled="!expense.trim()"
-				>
-					Add
-				</AppButton>
-			</form>
-		</div>
 	</div>
 </template>
 
