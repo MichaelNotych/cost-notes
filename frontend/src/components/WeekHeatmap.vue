@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
-import { useHeatmapIntensity } from '@/composables/useHeatmapIntensity'
 import AppTitle from './atoms/AppTitle.vue'
 import AppDate from './atoms/AppDate.vue'
 import AppButton from './atoms/AppButton.vue'
+import HeatmapCell from './HeatmapCell.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import ChevronLeftIcon from './icons/ChevronLeftIcon.vue'
 import ChevronRightIcon from './icons/ChevronRightIcon.vue'
@@ -13,7 +13,6 @@ import getCurrencySymbolFromCode from '@/plugins/currencies'
 defineEmits(['add-manual-expense'])
 
 const expensesStore = useExpensesStore()
-const { intensityClass, fmtCompact } = useHeatmapIntensity()
 
 const today = new Date()
 
@@ -97,25 +96,15 @@ const weekEndDate = computed(() => days.value[days.value.length - 1]?.date ?? nu
 
 		<!-- Heatmap cells -->
 		<div class="flex items-center">
-			<div
+			<HeatmapCell
 				v-for="(day, i) in days"
 				:key="i"
-				class="flex-1 aspect-square rounded-xl mx-0.5 transition-colors relative"
-				:class="intensityClass(day.value, day.isFuture, maxDailyAmount)"
-			>
-				<div
-					v-if="day.isToday"
-					class="absolute inset-0 rounded-xl ring-2 ring-sky-400 ring-offset-1 ring-offset-zinc-900"
-				></div>
-				<div
-					v-if="day.value > 0"
-					class="absolute inset-0 flex items-end justify-center pb-1"
-				>
-					<span class="text-xs font-mono text-white/60 leading-none">
-						{{ fmtCompact(day.value) }}
-					</span>
-				</div>
-			</div>
+				:amount="day.value"
+				:max-amount="maxDailyAmount"
+				:is-future="day.isFuture"
+				:is-today="day.isToday"
+				show-amount
+			/>
 		</div>
 	</div>
 </template>

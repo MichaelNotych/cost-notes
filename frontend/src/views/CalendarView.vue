@@ -3,11 +3,12 @@ import { onMounted, onUnmounted, computed, ref, nextTick } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import { useHeatmapIntensity } from '@/composables/useHeatmapIntensity'
 import DailyExpense from '@/components/DailyExpense.vue'
+import HeatmapCell from '@/components/HeatmapCell.vue'
 import AppButton from '@/components/atoms/AppButton.vue'
 import CloseIcon from '@/components/icons/CloseIcon.vue'
 
 const expensesStore = useExpensesStore()
-const { intensityClass: _intensityClass, fmtCompact } = useHeatmapIntensity()
+const { fmtCompact } = useHeatmapIntensity()
 
 const displayedMonths = ref([]) // [{year, month}], newest first
 const isLoadingMore = ref(false)
@@ -42,7 +43,7 @@ const periodTotal = computed(() => Object.values(dayTotals.value).reduce((s, v) 
 const monthsData = computed(() =>
 	displayedMonths.value.map(({ year, month: m }) => {
 		const daysInMonth = new Date(year, m + 1, 0).getDate()
-		const firstDayOfWeek = new Date(year, m, 1).getDay() // 0=Sun
+		const firstDayOfWeek = (new Date(year, m, 1).getDay() + 6) % 7 // 0=Mon
 
 		let monthTotal = 0
 		const weeks = []
@@ -88,8 +89,6 @@ const monthsData = computed(() =>
 		}
 	}),
 )
-
-const intensityClass = (amount, isFuture) => _intensityClass(amount, isFuture, maxDailyAmount.value)
 
 const fmt = (value) => {
 	if (!value) return '0'
@@ -241,7 +240,7 @@ onUnmounted(() => {
 					<!-- Day-of-week labels -->
 					<div class="flex mb-1">
 						<div
-							v-for="d in ['S', 'M', 'T', 'W', 'T', 'F', 'S']"
+							v-for="d in ['M', 'T', 'W', 'T', 'F', 'S', 'S']"
 							:key="d"
 							class="flex-1 text-center text-xs text-zinc-600 font-medium"
 						>
@@ -253,21 +252,17 @@ onUnmounted(() => {
 					<!-- Weeks -->
 					<div class="space-y-1">
 						<div v-for="(week, wi) in month.weeks" :key="wi" class="flex items-center">
-							<div
+							<HeatmapCell
 								v-for="(day, di) in week.days"
 								:key="di"
-								class="flex-1 aspect-square rounded-xl mx-0.5 transition-colors relative"
-								:class="[
-									day ? intensityClass(day.amount, day.isFuture) : 'invisible',
-									day && !day.isFuture ? 'cursor-pointer active:scale-90' : '',
-								]"
+								:amount="day?.amount ?? 0"
+								:max-amount="maxDailyAmount"
+								:is-future="day?.isFuture ?? false"
+								:is-today="day?.isToday ?? false"
+								:empty="!day"
+								clickable
 								@click="openDay(day)"
-							>
-								<div
-									v-if="day?.isToday"
-									class="absolute inset-0 rounded-xl ring-2 ring-sky-400 ring-offset-1 ring-offset-zinc-900"
-								></div>
-							</div>
+							/>
 							<div class="w-10 flex items-center justify-end pr-1">
 								<span
 									v-if="week.total > 0"
