@@ -45,6 +45,15 @@ export const useAuthStore = defineStore('auth', {
 			}
 		},
 
+		updateSetting(key, value) {
+			if (!this.user) return
+			this.user = {
+				...this.user,
+				settings: { ...this.user.settings, [key]: value },
+			}
+			localStorage.setItem('cn_user', JSON.stringify(this.user))
+		},
+
 		async logout() {
 			try {
 				// Call backend logout endpoint to revoke refresh token

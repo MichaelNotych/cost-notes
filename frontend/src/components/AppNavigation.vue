@@ -1,12 +1,15 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import CalendarIcon from './icons/CalendarIcon.vue'
 import HomeIcon from './icons/HomeIcon.vue'
 import SeetingsIcon from './icons/SeetingsIcon.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import ManualExpenseDialog from './ManualExpenseDialog.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const dialog = ref(null)
+const authStore = useAuthStore()
+const showLabels = computed(() => authStore.user?.settings?.showNavLabels ?? false)
 
 const menu = [
 	{
@@ -40,7 +43,7 @@ const menu = [
 			activeClass="opacity-100"
 		>
 			<component :is="item.icon" v-if="item.icon" />
-			<span class="text-xs">{{ item.name }}</span>
+			<span v-if="showLabels" class="text-xs">{{ item.name }}</span>
 		</RouterLink>
 
 		<!-- Center add button -->
@@ -61,7 +64,7 @@ const menu = [
 			activeClass="opacity-100"
 		>
 			<component :is="item.icon" v-if="item.icon" />
-			<span class="text-xs">{{ item.name }}</span>
+			<span v-if="showLabels" class="text-xs">{{ item.name }}</span>
 		</RouterLink>
 	</nav>
 
