@@ -179,7 +179,7 @@ defineExpose({ open })
 								v-model="note"
 								type="text"
 								placeholder="Title"
-								class="bg-transparent text-gray-300 placeholder-zinc-600 focus:outline-none w-full text-sm"
+								class="bg-transparent text-gray-300 placeholder-zinc-600 focus:outline-none w-full text-base"
 							/>
 						</div>
 					</div>
@@ -201,7 +201,7 @@ defineExpose({ open })
 							<input
 								v-model="selectedDateStr"
 								type="date"
-								class="bg-transparent text-gray-300 focus:outline-none w-full text-sm [color-scheme:dark]"
+								class="bg-transparent text-gray-300 focus:outline-none w-full text-base"
 							/>
 						</div>
 					</div>
@@ -245,7 +245,7 @@ defineExpose({ open })
 							]"
 							:key="key"
 							@click="pressKey(key)"
-							class="bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white font-semibold text-xl rounded-2xl h-14 flex items-center justify-center transition-colors select-none"
+							class="bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white font-semibold text-xl rounded-2xl h-14 flex items-center justify-center transition-colors select-none touch-manipulation"
 						>
 							<template v-if="key === '⌫'">
 								<svg
