@@ -29,7 +29,7 @@ const menu = [
 
 <template>
 	<nav
-		class="fixed bottom-0 left-0 right-0 z-40 flex justify-around items-center gap-4 p-6 px-8 pb-10 bg-zinc-900 h-25"
+		class="fixed bottom-4 left-4 right-4 z-40 flex justify-around items-center gap-4 px-6 py-4 bg-zinc-900/90 backdrop-blur-md rounded-3xl shadow-xl shadow-black/30"
 	>
 		<!-- First two nav items -->
 		<RouterLink
