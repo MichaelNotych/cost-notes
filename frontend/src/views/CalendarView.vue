@@ -187,8 +187,8 @@ onUnmounted(() => {
 <template>
 	<div class="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
 		<!-- Header -->
-		<div class="flex items-center justify-between px-4 py-3 sticky top-0 bg-zinc-900 z-10">
-			<p class="font-semibold text-white">Calendar</p>
+		<div class="flex items-center justify-between mb-4">
+			<h1 class="text-2xl font-semibold text-white">Calendar</h1>
 			<p class="text-xs text-sky-400 font-mono">
 				{{ fmt(periodTotal) }} {{ defaultCurrency }}
 			</p>
@@ -203,7 +203,7 @@ onUnmounted(() => {
 
 		<template v-else>
 			<!-- Legend -->
-			<div class="flex items-center gap-2 px-4 pt-2 pb-4">
+			<div class="flex items-center gap-2 pt-2 pb-4">
 				<span class="text-xs text-zinc-500">$0</span>
 				<div class="flex gap-0.5 flex-1">
 					<div
@@ -225,7 +225,7 @@ onUnmounted(() => {
 			</div>
 
 			<!-- Month blocks -->
-			<div class="px-4 space-y-6 pb-4">
+			<div class="space-y-6 pb-4">
 				<div v-for="(month, mi) in monthsData" :key="mi">
 					<!-- Month header -->
 					<div class="flex items-baseline justify-between mb-2">
