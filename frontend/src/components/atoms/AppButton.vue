@@ -62,7 +62,7 @@ const classes = computed(() => {
 <template>
 	<button :type="type" :class="classes" :disabled="disabled || loading">
 		<span v-if="loading" :class="`${size !== 'icon' ? 'mr-2' : ''}`">
-			<SpinnerIcon />
+			<SpinnerIcon :class="`${size === 'xl' ? 'size-6' : ''}`" />
 		</span>
 		<slot v-if="!(size === 'icon' && loading)" />
 	</button>

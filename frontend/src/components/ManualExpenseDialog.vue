@@ -316,7 +316,7 @@ defineExpose({ open })
 								class="w-full"
 								@click="handleSave"
 							>
-								Save
+								<span :class="`${isSubmitting ? 'opacity-0 w-0' : ''}`">Save</span>
 							</AppButton>
 						</div>
 					</template>
