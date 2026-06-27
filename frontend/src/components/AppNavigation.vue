@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import CalendarIcon from './icons/CalendarIcon.vue'
 import HomeIcon from './icons/HomeIcon.vue'
-import SeetingsIcon from './icons/SeetingsIcon.vue'
+import SettingsIcon from './icons/SettingsIcon.vue/index.js'
 import PlusIcon from './icons/PlusIcon.vue'
 import ManualExpenseDialog from './ManualExpenseDialog.vue'
 import { useAuthStore } from '@/stores/auth'
@@ -24,7 +24,7 @@ const menu = [
 	},
 	{
 		name: 'Settings',
-		icon: SeetingsIcon,
+		icon: SettingsIcon,
 		path: '/settings',
 	},
 ]
