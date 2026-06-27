@@ -311,7 +311,8 @@ onUnmounted(() => {
 									{{ selectedDayLabel }}
 								</p>
 								<p class="text-xs text-sky-400 font-mono mt-0.5">
-									{{ formatAmount(selectedDayTotal) }} {{ expensesStore.defaultCurrency }}
+									{{ formatAmount(selectedDayTotal) }}
+									{{ expensesStore.defaultCurrency }}
 								</p>
 							</div>
 							<AppButton
