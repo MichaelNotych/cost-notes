@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import CalendarIcon from './icons/CalendarIcon.vue'
 import HomeIcon from './icons/HomeIcon.vue'
-import SettingsIcon from './icons/SettingsIcon.vue/index.js'
+import SettingsIcon from './icons/SettingsIcon.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import ManualExpenseDialog from './ManualExpenseDialog.vue'
 import { useAuthStore } from '@/stores/auth'
