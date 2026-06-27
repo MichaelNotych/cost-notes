@@ -2,6 +2,41 @@ import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
 import { toast } from '@/plugins/toast'
 
+// Returns the Monday (00:00:00) of the week containing `date`
+const getMondayOfWeek = (date) => {
+	const day = date.getDay()
+	const monday = new Date(date)
+	monday.setDate(date.getDate() - (day === 0 ? 6 : day - 1))
+	monday.setHours(0, 0, 0, 0)
+	return monday
+}
+
+// Returns a "<emoji> <name>" string for grouping category buckets
+const getCategoryKey = (category) => {
+	const name = typeof category === 'object' ? category?.name || 'Uncategorized' : 'Uncategorized'
+	const emoji = typeof category === 'object' ? category?.emoji || '📝' : '📝'
+	return `${emoji} ${name}`
+}
+
+// Groups expenses by a period key returned from `getPeriod(expense)`
+// getPeriod must return { key, name, sortDate }
+const groupExpensesByPeriod = (expenses, getPeriod) => {
+	const map = {}
+	expenses.forEach((expense) => {
+		const { key, name, sortDate } = getPeriod(expense)
+		if (!map[key]) {
+			map[key] = { id: key, name, categories: {}, total: 0, sortDate }
+		}
+		const categoryKey = getCategoryKey(expense.category)
+		const amount = expense.defaultCurrencyAmount || 0
+		map[key].categories[categoryKey] = (map[key].categories[categoryKey] || 0) + amount
+		map[key].total += amount
+	})
+	return Object.values(map)
+		.sort((a, b) => b.sortDate - a.sortDate)
+		.map(({ id, name, categories, total }) => ({ id, name, categories, total }))
+}
+
 export const useExpensesStore = defineStore('expenses', {
 	state: () => ({
 		expenses: [],
@@ -18,15 +53,23 @@ export const useExpensesStore = defineStore('expenses', {
 
 	getters: {
 		/**
+		 * User's default currency, derived from loaded expense data.
+		 * Checks both the regular and calendar expense lists.
+		 */
+		defaultCurrency: (state) => {
+			return (
+				state.expenses.find((e) => e.defaultCurrency)?.defaultCurrency ||
+				state.calendarExpenses.find((e) => e.defaultCurrency)?.defaultCurrency ||
+				'USD'
+			)
+		},
+
+		/**
 		 * Start and end dates of the currently selected week
 		 */
 		selectedWeekRange: (state) => {
-			const today = new Date()
-			const currentDay = today.getDay() // 0 (Sun) to 6 (Sat)
-			const mondayDiff = currentDay === 0 ? -6 : 1 - currentDay
-			const monday = new Date(today)
-			monday.setDate(today.getDate() + mondayDiff + state.currentWeekOffset * 7)
-			monday.setHours(0, 0, 0, 0)
+			const monday = getMondayOfWeek(new Date())
+			monday.setDate(monday.getDate() + state.currentWeekOffset * 7)
 
 			const sunday = new Date(monday)
 			sunday.setDate(monday.getDate() + 6)
@@ -114,65 +157,24 @@ export const useExpensesStore = defineStore('expenses', {
 
 			return groupsArray
 		},
+
 		/**
 		 * Group expenses by week (Monday to Sunday)
 		 * Returns an array of { id, name, categories, total }
 		 */
 		expensesByWeek: (state) => {
 			if (!state.expenses || state.expenses.length === 0) return []
-
-			const weeksMap = {}
-
-			state.expenses.forEach((expense) => {
-				const date = new Date(expense.createdAt)
-				// Get Monday of the week
-				const day = date.getDay()
-				const diff = date.getDate() - (day === 0 ? 6 : day - 1)
-				const monday = new Date(date)
-				monday.setDate(diff)
-				monday.setHours(0, 0, 0, 0)
-
+			return groupExpensesByPeriod(state.expenses, (expense) => {
+				const monday = getMondayOfWeek(new Date(expense.createdAt))
 				const sunday = new Date(monday)
 				sunday.setDate(monday.getDate() + 6)
 				sunday.setHours(23, 59, 59, 999)
-
-				const weekKey = monday.toISOString().split('T')[0]
-
-				if (!weeksMap[weekKey]) {
-					weeksMap[weekKey] = {
-						id: weekKey,
-						name: `${monday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
-						categories: {},
-						total: 0,
-						mondayDate: monday,
-					}
+				return {
+					key: monday.toISOString().split('T')[0],
+					name: `${monday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`,
+					sortDate: monday,
 				}
-
-				const categoryName =
-					typeof expense.category === 'object'
-						? expense.category.name || 'Uncategorized'
-						: 'Uncategorized'
-				const categoryEmoji =
-					typeof expense.category === 'object' ? expense.category.emoji || '📝' : '📝'
-
-				const categoryKey = `${categoryEmoji} ${categoryName}`
-				const amount = expense.defaultCurrencyAmount || 0
-
-				if (!weeksMap[weekKey].categories[categoryKey]) {
-					weeksMap[weekKey].categories[categoryKey] = 0
-				}
-				weeksMap[weekKey].categories[categoryKey] += amount
-				weeksMap[weekKey].total += amount
 			})
-
-			return Object.values(weeksMap)
-				.sort((a, b) => b.mondayDate - a.mondayDate)
-				.map(({ id, name, categories, total }) => ({
-					id,
-					name,
-					categories,
-					total,
-				}))
 		},
 
 		/**
@@ -181,55 +183,20 @@ export const useExpensesStore = defineStore('expenses', {
 		 */
 		expensesByMonth: (state) => {
 			if (!state.expenses || state.expenses.length === 0) return []
-
-			const monthsMap = {}
-
-			state.expenses.forEach((expense) => {
+			return groupExpensesByPeriod(state.expenses, (expense) => {
 				const date = new Date(expense.createdAt)
-				const month = date.getMonth()
 				const year = date.getFullYear()
-
+				const month = date.getMonth()
 				const monthDate = new Date(year, month, 1)
-				const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`
-
-				if (!monthsMap[monthKey]) {
-					monthsMap[monthKey] = {
-						id: monthKey,
-						name: monthDate.toLocaleDateString(undefined, {
-							month: 'long',
-							year: 'numeric',
-						}),
-						categories: {},
-						total: 0,
-						monthDate: monthDate,
-					}
+				return {
+					key: `${year}-${String(month + 1).padStart(2, '0')}`,
+					name: monthDate.toLocaleDateString(undefined, {
+						month: 'long',
+						year: 'numeric',
+					}),
+					sortDate: monthDate,
 				}
-
-				const categoryName =
-					typeof expense.category === 'object'
-						? expense.category.name || 'Uncategorized'
-						: 'Uncategorized'
-				const categoryEmoji =
-					typeof expense.category === 'object' ? expense.category.emoji || '📝' : '📝'
-
-				const categoryKey = `${categoryEmoji} ${categoryName}`
-				const amount = expense.defaultCurrencyAmount || 0
-
-				if (!monthsMap[monthKey].categories[categoryKey]) {
-					monthsMap[monthKey].categories[categoryKey] = 0
-				}
-				monthsMap[monthKey].categories[categoryKey] += amount
-				monthsMap[monthKey].total += amount
 			})
-
-			return Object.values(monthsMap)
-				.sort((a, b) => b.monthDate - a.monthDate)
-				.map(({ id, name, categories, total }) => ({
-					id,
-					name,
-					categories,
-					total,
-				}))
 		},
 	},
 

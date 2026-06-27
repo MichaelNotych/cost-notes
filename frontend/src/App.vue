@@ -1,9 +1,22 @@
 <script setup>
+import { watch } from 'vue'
 import AppNavigation from './components/AppNavigation.vue'
 import ToastContainer from './components/ToastContainer.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useCategoriesStore } from '@/stores/categories'
 
 const authStore = useAuthStore()
+const categoriesStore = useCategoriesStore()
+
+watch(
+	() => authStore.isAuthenticated,
+	(authenticated) => {
+		if (authenticated && categoriesStore.categories.length === 0) {
+			categoriesStore.fetchCategories()
+		}
+	},
+	{ immediate: true },
+)
 </script>
 
 <template>

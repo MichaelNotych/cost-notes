@@ -16,11 +16,6 @@ const expensesStore = useExpensesStore()
 
 const today = new Date()
 
-const defaultCurrency = computed(() => {
-	const first = expensesStore.expenses.find((e) => e.defaultCurrency)
-	return first?.defaultCurrency || 'USD'
-})
-
 const days = computed(() => {
 	return expensesStore.currentWeekDailyTotals.map((d) => ({
 		...d,
@@ -78,7 +73,7 @@ const weekEndDate = computed(() => days.value[days.value.length - 1]?.date ?? nu
 			<AppTitle variant="subtitle">
 				<span class="font-mono">{{ weeklyTotal.toLocaleString() }}</span>
 				<span class="text-xs text-gray-400 ml-1">{{
-					getCurrencySymbolFromCode(defaultCurrency)
+					getCurrencySymbolFromCode(expensesStore.defaultCurrency)
 				}}</span>
 			</AppTitle>
 		</div>

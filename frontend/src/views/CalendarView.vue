@@ -18,11 +18,6 @@ let observer = null
 
 const today = new Date()
 
-const defaultCurrency = computed(() => {
-	const first = expensesStore.calendarExpenses.find((e) => e.defaultCurrency)
-	return first?.defaultCurrency || 'USD'
-})
-
 const dayTotals = computed(() => {
 	const map = {}
 	expensesStore.calendarExpenses.forEach((expense) => {
@@ -190,7 +185,7 @@ onUnmounted(() => {
 		<div class="flex items-center justify-between mb-4">
 			<h1 class="text-2xl font-semibold text-white">Calendar</h1>
 			<p class="text-xs text-sky-400 font-mono">
-				{{ fmt(periodTotal) }} {{ defaultCurrency }}
+				{{ fmt(periodTotal) }} {{ expensesStore.defaultCurrency }}
 			</p>
 		</div>
 
@@ -321,7 +316,7 @@ onUnmounted(() => {
 									{{ selectedDayLabel }}
 								</p>
 								<p class="text-xs text-sky-400 font-mono mt-0.5">
-									{{ fmt(selectedDayTotal) }} {{ defaultCurrency }}
+									{{ fmt(selectedDayTotal) }} {{ expensesStore.defaultCurrency }}
 								</p>
 							</div>
 							<AppButton

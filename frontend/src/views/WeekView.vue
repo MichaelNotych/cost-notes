@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import AppTitle from '@/components/atoms/AppTitle.vue'
 import DailyExpense from '@/components/DailyExpense.vue'
@@ -17,11 +17,6 @@ const toggleWeek = (id) => {
 		openWeeks.value.add(id)
 	}
 }
-
-const defaultCurrency = computed(() => {
-	const firstExpenseWithCurrency = expensesStore.expenses.find((e) => e.defaultCurrency)
-	return firstExpenseWithCurrency?.defaultCurrency || 'USD'
-})
 
 onMounted(async () => {
 	if (expensesStore.expenses.length === 0) {
@@ -60,7 +55,7 @@ onMounted(async () => {
 				>
 					<div>
 						<AppTitle variant="subtitle">{{ week.name }}:</AppTitle>
-						<AppPrice :amount="week.total" :currency="defaultCurrency" />
+						<AppPrice :amount="week.total" :currency="expensesStore.defaultCurrency" />
 					</div>
 					<div
 						class="text-zinc-500 transition-transform duration-300 transform"
@@ -79,7 +74,7 @@ onMounted(async () => {
 								},
 								title: category.split(' ')[1],
 								amount: amount,
-								currency: defaultCurrency,
+								currency: expensesStore.defaultCurrency,
 							}"
 						/>
 					</div>

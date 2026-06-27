@@ -42,7 +42,9 @@ const fields = [
 ]
 
 onMounted(async () => {
-	await categoriesStore.fetchCategories()
+	if (categoriesStore.categories.length === 0) {
+		await categoriesStore.fetchCategories()
+	}
 })
 
 const onAddCategory = async (values, { resetForm }) => {
