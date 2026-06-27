@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthView from '../views/AuthView.vue'
 import ExpensesView from '../views/ExpensesView.vue'
-import BrandKitView from '../views/BrandKitView.vue'
 
 import { useAuthStore } from '@/stores/auth'
 import WeekView from '@/views/WeekView.vue'
@@ -39,11 +38,6 @@ const router = createRouter({
 			name: 'SettingsView',
 			component: SettingsView,
 			meta: { requiresAuth: true },
-		},
-		{
-			path: '/brand-kit',
-			name: 'BrandKitView',
-			component: BrandKitView,
 		},
 	],
 })
