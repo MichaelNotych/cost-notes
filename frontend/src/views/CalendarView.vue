@@ -1,14 +1,14 @@
 <script setup>
 import { onMounted, onUnmounted, computed, ref, nextTick } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
-import { useHeatmapIntensity } from '@/composables/useHeatmapIntensity'
+import { useNumberFormat } from '@/composables/useNumberFormat'
 import DailyExpense from '@/components/DailyExpense.vue'
 import HeatmapCell from '@/components/HeatmapCell.vue'
 import AppButton from '@/components/atoms/AppButton.vue'
 import CloseIcon from '@/components/icons/CloseIcon.vue'
 
 const expensesStore = useExpensesStore()
-const { fmtCompact } = useHeatmapIntensity()
+const { fmtCompact, formatAmount } = useNumberFormat()
 
 const displayedMonths = ref([]) // [{year, month}], newest first
 const isLoadingMore = ref(false)
@@ -20,7 +20,7 @@ const today = new Date()
 
 const dayTotals = computed(() => {
 	const map = {}
-	expensesStore.calendarExpenses.forEach((expense) => {
+	expensesStore.allExpenses.forEach((expense) => {
 		const d = new Date(expense.createdAt)
 		const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 		map[key] = (map[key] || 0) + (expense.defaultCurrencyAmount || 0)
@@ -85,16 +85,11 @@ const monthsData = computed(() =>
 	}),
 )
 
-const fmt = (value) => {
-	if (!value) return '0'
-	return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
 const selectedDayKey = ref(null)
 
 const selectedDayExpenses = computed(() => {
 	if (!selectedDayKey.value) return []
-	return expensesStore.calendarExpenses.filter((e) => {
+	return expensesStore.allExpenses.filter((e) => {
 		const d = new Date(e.createdAt)
 		const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 		return k === selectedDayKey.value
@@ -185,7 +180,7 @@ onUnmounted(() => {
 		<div class="flex items-center justify-between mb-4">
 			<h1 class="text-2xl font-semibold text-white">Calendar</h1>
 			<p class="text-xs text-sky-400 font-mono">
-				{{ fmt(periodTotal) }} {{ expensesStore.defaultCurrency }}
+				{{ formatAmount(periodTotal) }} {{ expensesStore.defaultCurrency }}
 			</p>
 		</div>
 
@@ -228,7 +223,7 @@ onUnmounted(() => {
 							{{ month.name }}
 						</h3>
 						<span class="text-xs font-mono text-sky-500">
-							{{ month.total > 0 ? fmt(month.total) : '—' }}
+							{{ month.total > 0 ? formatAmount(month.total) : '—' }}
 						</span>
 					</div>
 
@@ -316,7 +311,7 @@ onUnmounted(() => {
 									{{ selectedDayLabel }}
 								</p>
 								<p class="text-xs text-sky-400 font-mono mt-0.5">
-									{{ fmt(selectedDayTotal) }} {{ expensesStore.defaultCurrency }}
+									{{ formatAmount(selectedDayTotal) }} {{ expensesStore.defaultCurrency }}
 								</p>
 							</div>
 							<AppButton

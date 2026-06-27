@@ -1,4 +1,8 @@
+import { useNumberFormat } from './useNumberFormat'
+
 export function useHeatmapIntensity() {
+	const { fmtCompact } = useNumberFormat()
+
 	const intensityClass = (amount, isFuture, max) => {
 		if (isFuture) return 'bg-white/5'
 		if (!amount) return 'bg-white/5'
@@ -10,13 +14,6 @@ export function useHeatmapIntensity() {
 		if (r <= 0.75) return 'bg-sky-700'
 		if (r <= 0.9) return 'bg-sky-600'
 		return 'bg-sky-400'
-	}
-
-	const fmtCompact = (value) => {
-		if (!value) return ''
-		if (value >= 10000) return `${(value / 1000).toFixed(0)}k`
-		if (value >= 1000) return `${(value / 1000).toFixed(1)}k`
-		return value.toFixed(0)
 	}
 
 	return { intensityClass, fmtCompact }

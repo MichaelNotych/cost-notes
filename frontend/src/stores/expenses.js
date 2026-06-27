@@ -11,6 +11,12 @@ const getMondayOfWeek = (date) => {
 	return monday
 }
 
+const mergeExpenses = (existing, incoming) => {
+	const map = new Map(existing.map((e) => [e._id, e]))
+	incoming.forEach((e) => map.set(e._id, e))
+	return Array.from(map.values())
+}
+
 // Returns a "<emoji> <name>" string for grouping category buckets
 const getCategoryKey = (category) => {
 	const name = typeof category === 'object' ? category?.name || 'Uncategorized' : 'Uncategorized'
@@ -39,7 +45,7 @@ const groupExpensesByPeriod = (expenses, getPeriod) => {
 
 export const useExpensesStore = defineStore('expenses', {
 	state: () => ({
-		expenses: [],
+		allExpenses: [],
 		error: null,
 		isAddingExpense: false,
 		isLoadingExpenses: false,
@@ -47,7 +53,6 @@ export const useExpensesStore = defineStore('expenses', {
 		loadedWeeks: 0,
 		totalPages: 1,
 		currentPage: 1,
-		calendarExpenses: [],
 		isLoadingCalendar: false,
 	}),
 
@@ -57,11 +62,7 @@ export const useExpensesStore = defineStore('expenses', {
 		 * Checks both the regular and calendar expense lists.
 		 */
 		defaultCurrency: (state) => {
-			return (
-				state.expenses.find((e) => e.defaultCurrency)?.defaultCurrency ||
-				state.calendarExpenses.find((e) => e.defaultCurrency)?.defaultCurrency ||
-				'USD'
-			)
+			return state.allExpenses.find((e) => e.defaultCurrency)?.defaultCurrency || 'USD'
 		},
 
 		/**
@@ -83,7 +84,7 @@ export const useExpensesStore = defineStore('expenses', {
 		 * Returns an array of { label: string, value: number }
 		 */
 		currentWeekDailyTotals(state) {
-			if (!state.expenses) return []
+			if (!state.allExpenses) return []
 
 			const { monday, sunday } = this.selectedWeekRange
 
@@ -98,7 +99,7 @@ export const useExpensesStore = defineStore('expenses', {
 				})
 			}
 
-			state.expenses.forEach((expense) => {
+			state.allExpenses.forEach((expense) => {
 				const expenseDate = new Date(expense.createdAt)
 				expenseDate.setHours(0, 0, 0, 0)
 
@@ -124,11 +125,11 @@ export const useExpensesStore = defineStore('expenses', {
 		 * Returns an array of { date: string, items: Expense[] }
 		 */
 		groupedExpenses(state) {
-			if (!state.expenses) return []
+			if (!state.allExpenses) return []
 
 			const { monday, sunday } = this.selectedWeekRange
 
-			const filteredExpenses = state.expenses.filter((expense) => {
+			const filteredExpenses = state.allExpenses.filter((expense) => {
 				const d = new Date(expense.createdAt)
 				return d >= monday && d <= sunday
 			})
@@ -163,8 +164,8 @@ export const useExpensesStore = defineStore('expenses', {
 		 * Returns an array of { id, name, categories, total }
 		 */
 		expensesByWeek: (state) => {
-			if (!state.expenses || state.expenses.length === 0) return []
-			return groupExpensesByPeriod(state.expenses, (expense) => {
+			if (!state.allExpenses || state.allExpenses.length === 0) return []
+			return groupExpensesByPeriod(state.allExpenses, (expense) => {
 				const monday = getMondayOfWeek(new Date(expense.createdAt))
 				const sunday = new Date(monday)
 				sunday.setDate(monday.getDate() + 6)
@@ -182,8 +183,8 @@ export const useExpensesStore = defineStore('expenses', {
 		 * Returns an array of { id, name, categories, total }
 		 */
 		expensesByMonth: (state) => {
-			if (!state.expenses || state.expenses.length === 0) return []
-			return groupExpensesByPeriod(state.expenses, (expense) => {
+			if (!state.allExpenses || state.allExpenses.length === 0) return []
+			return groupExpensesByPeriod(state.allExpenses, (expense) => {
 				const date = new Date(expense.createdAt)
 				const year = date.getFullYear()
 				const month = date.getMonth()
@@ -228,7 +229,7 @@ export const useExpensesStore = defineStore('expenses', {
 						period: `${requiredWeeks}w`,
 					},
 				})
-				this.expenses = response.data.expenses
+				this.allExpenses = mergeExpenses(this.allExpenses, response.data.expenses)
 				this.totalPages = response.data.totalPages
 				this.currentPage = response.data.currentPage
 				this.loadedWeeks = requiredWeeks
@@ -247,7 +248,7 @@ export const useExpensesStore = defineStore('expenses', {
 				const response = await axiosIns.get('/expenses', {
 					params: { page },
 				})
-				this.expenses = response.data.expenses
+				this.allExpenses = mergeExpenses(this.allExpenses, response.data.expenses)
 				this.totalPages = response.data.totalPages
 				this.currentPage = response.data.currentPage
 			} catch (err) {
@@ -269,7 +270,7 @@ export const useExpensesStore = defineStore('expenses', {
 				const response = await axiosIns.post('/expense', {
 					userDescription: expenseData,
 				})
-				this.expenses.push(response.data)
+				this.allExpenses.push(response.data)
 				toast.success('Expense added successfully')
 				return response.data
 			} catch (err) {
@@ -291,7 +292,7 @@ export const useExpensesStore = defineStore('expenses', {
 			this.isAddingExpense = true
 			try {
 				const response = await axiosIns.post('/manual-expense', expenseData)
-				this.expenses.push(response.data)
+				this.allExpenses.push(response.data)
 				toast.success('Expense added successfully')
 				return response.data
 			} catch (err) {
@@ -314,9 +315,9 @@ export const useExpensesStore = defineStore('expenses', {
 			try {
 				const response = await axiosIns.put(`/expense/${id}`, expenseData)
 				const updatedExpense = response.data
-				const index = this.expenses.findIndex((e) => e._id === id)
+				const index = this.allExpenses.findIndex((e) => e._id === id)
 				if (index !== -1) {
-					this.expenses[index] = updatedExpense
+					this.allExpenses[index] = updatedExpense
 				}
 				toast.success('Expense updated successfully')
 				return updatedExpense
@@ -334,7 +335,7 @@ export const useExpensesStore = defineStore('expenses', {
 				const response = await axiosIns.get('/expenses', {
 					params: { startDate, endDate, limit: 2000 },
 				})
-				this.calendarExpenses = response.data.expenses
+				this.allExpenses = mergeExpenses(this.allExpenses, response.data.expenses)
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to fetch calendar expenses'
@@ -348,7 +349,7 @@ export const useExpensesStore = defineStore('expenses', {
 				const response = await axiosIns.get('/expenses', {
 					params: { startDate, endDate, limit: 2000 },
 				})
-				this.calendarExpenses.push(...response.data.expenses)
+				this.allExpenses = mergeExpenses(this.allExpenses, response.data.expenses)
 				return response.data.expenses.length
 			} catch (err) {
 				console.error(err)
@@ -364,7 +365,7 @@ export const useExpensesStore = defineStore('expenses', {
 			this.error = null
 			try {
 				await axiosIns.delete(`/expense/${id}`)
-				this.expenses = this.expenses.filter((e) => e._id !== id)
+				this.allExpenses = this.allExpenses.filter((e) => e._id !== id)
 				toast.success('Expense deleted successfully')
 			} catch (err) {
 				console.error(err)

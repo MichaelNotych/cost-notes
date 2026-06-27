@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
 import { useExpensesStore } from '@/stores/expenses'
+import { useNumberFormat } from '@/composables/useNumberFormat'
 import AppButton from '@/components/atoms/AppButton.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import AppTitle from '@/components/atoms/AppTitle.vue'
@@ -10,6 +11,7 @@ import Card from './Card.vue'
 import DailyExpense from './DailyExpense.vue'
 
 const expensesStore = useExpensesStore()
+const { formatAmount } = useNumberFormat()
 
 const props = defineProps({
 	date: {
@@ -27,13 +29,6 @@ const dailyTotal = computed(() => {
 		return sum + (parseFloat(expense.defaultCurrencyAmount) || 0)
 	}, 0)
 })
-
-const formatAmount = (value) => {
-	if (!value) return '0'
-	const parts = value.toString().split('.')
-	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-	return parts.join('.')
-}
 </script>
 
 <template>
@@ -49,7 +44,7 @@ const formatAmount = (value) => {
 				<PlusIcon />
 			</AppButton>
 			<AppTitle variant="subtitle">
-				<span class="font-mono">{{ formatAmount(dailyTotal.toFixed(2)) }}</span>
+				<span class="font-mono">{{ formatAmount(dailyTotal) }}</span>
 				<span class="text-xs text-gray-400 ml-1">
 					{{ getCurrencySymbolFromCode(expensesStore.defaultCurrency) }}
 				</span>

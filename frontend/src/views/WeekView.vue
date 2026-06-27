@@ -19,7 +19,7 @@ const toggleWeek = (id) => {
 }
 
 onMounted(async () => {
-	if (expensesStore.expenses.length === 0) {
+	if (expensesStore.allExpenses.length === 0) {
 		await expensesStore.fetchExpenses()
 	}
 })
