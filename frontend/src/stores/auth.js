@@ -1,10 +1,13 @@
 import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
 import { toast } from '@/plugins/toast'
+import { LS_KEYS } from '@/constants'
+
+const { USER, ACCESS_TOKEN, REFRESH_TOKEN } = LS_KEYS
 
 export const useAuthStore = defineStore('auth', {
 	state: () => ({
-		user: JSON.parse(localStorage.getItem('cn_user')) || null,
+		user: JSON.parse(localStorage.getItem(USER)) || null,
 	}),
 
 	getters: {
@@ -15,21 +18,21 @@ export const useAuthStore = defineStore('auth', {
 		setUser(user, accessToken, refreshToken) {
 			this.user = user
 			if (user) {
-				localStorage.setItem('cn_user', JSON.stringify(user))
+				localStorage.setItem(USER, JSON.stringify(user))
 			} else {
-				localStorage.removeItem('cn_user')
+				localStorage.removeItem(USER)
 			}
 
 			if (accessToken) {
-				localStorage.setItem('cn_access_token', accessToken)
+				localStorage.setItem(ACCESS_TOKEN, accessToken)
 			} else if (accessToken === null) {
-				localStorage.removeItem('cn_access_token')
+				localStorage.removeItem(ACCESS_TOKEN)
 			}
 
 			if (refreshToken) {
-				localStorage.setItem('cn_refresh_token', refreshToken)
+				localStorage.setItem(REFRESH_TOKEN, refreshToken)
 			} else if (refreshToken === null) {
-				localStorage.removeItem('cn_refresh_token')
+				localStorage.removeItem(REFRESH_TOKEN)
 			}
 
 			// Remove old token key if it exists
@@ -38,10 +41,10 @@ export const useAuthStore = defineStore('auth', {
 
 		setTokens(accessToken, refreshToken) {
 			if (accessToken) {
-				localStorage.setItem('cn_access_token', accessToken)
+				localStorage.setItem(ACCESS_TOKEN, accessToken)
 			}
 			if (refreshToken) {
-				localStorage.setItem('cn_refresh_token', refreshToken)
+				localStorage.setItem(REFRESH_TOKEN, refreshToken)
 			}
 		},
 
@@ -51,20 +54,18 @@ export const useAuthStore = defineStore('auth', {
 				...this.user,
 				settings: { ...this.user.settings, [key]: value },
 			}
-			localStorage.setItem('cn_user', JSON.stringify(this.user))
+			localStorage.setItem(USER, JSON.stringify(this.user))
 		},
 
 		async logout() {
 			try {
-				// Call backend logout endpoint to revoke refresh token
 				await axiosIns.post('/auth/logout', {
-					refreshToken: localStorage.getItem('cn_refresh_token'),
+					refreshToken: localStorage.getItem(REFRESH_TOKEN),
 				})
 			} catch (error) {
 				console.error('Logout error:', error)
 				toast.error('Failed to logout smoothly, clearing session locally')
 			} finally {
-				// Clear local state regardless of API call result
 				this.setUser(null, null, null)
 			}
 		},

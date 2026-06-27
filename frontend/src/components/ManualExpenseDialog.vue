@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import { useCategoriesStore } from '@/stores/categories'
+import { LS_KEYS, CURRENCIES } from '@/constants'
 import CloseIcon from './icons/CloseIcon.vue'
 import BackspaceIcon from './icons/BackspaceIcon.vue'
 import AppInput from '@/components/atoms/AppInput.vue'
@@ -11,12 +12,10 @@ import getCurrencySymbolFromCode from '@/plugins/currencies'
 const expensesStore = useExpensesStore()
 const categoriesStore = useCategoriesStore()
 
-const CURRENCIES = ['VND', 'LAK', 'USD', 'EUR', 'GBP', 'UAH', 'PLN', 'TRY', 'THB']
-const LAST_CURRENCY_KEY = 'lastUsedCurrency'
-const LAST_MODE_KEY = 'lastUsedExpenseMode'
+const { LAST_CURRENCY, LAST_MODE } = LS_KEYS
 
 const isOpen = ref(false)
-const isAiMode = ref(localStorage.getItem(LAST_MODE_KEY) === 'ai')
+const isAiMode = ref(localStorage.getItem(LAST_MODE) === 'ai')
 const selectedDateStr = ref('')
 const amountStr = ref('0')
 const note = ref('')
@@ -49,7 +48,7 @@ const open = (date, _isWeek = false) => {
 	note.value = ''
 	aiText.value = ''
 	selectedCategory.value = categoriesStore.categories[0]?._id || null
-	selectedCurrency.value = localStorage.getItem(LAST_CURRENCY_KEY) || 'USD'
+	selectedCurrency.value = localStorage.getItem(LAST_CURRENCY) || 'USD'
 	isOpen.value = true
 }
 
@@ -75,7 +74,7 @@ const handleSave = async () => {
 	if (!canSave.value || isSubmitting.value) return
 	isSubmitting.value = true
 	try {
-		localStorage.setItem(LAST_CURRENCY_KEY, selectedCurrency.value)
+		localStorage.setItem(LAST_CURRENCY, selectedCurrency.value)
 		const [y, m, d] = selectedDateStr.value.split('-').map(Number)
 		const now = new Date()
 		const createdAt = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds())
@@ -146,7 +145,7 @@ defineExpose({ open })
 							@click="
 								() => {
 									isAiMode = !isAiMode
-									localStorage.setItem(LAST_MODE_KEY, isAiMode ? 'ai' : 'manual')
+									localStorage.setItem(LAST_MODE, isAiMode ? 'ai' : 'manual')
 								}
 							"
 							class="p-2 -ml-2 transition-colors"

@@ -2,11 +2,13 @@ import axios from 'axios'
 import router from '../router'
 
 import { useAuthStore } from '@/stores/auth'
+import { LS_KEYS } from '@/constants'
 
 const API_URL = import.meta.env.VITE_API_URL
 const axiosIns = axios.create({
 	baseURL: API_URL,
 })
+const { ACCESS_TOKEN, REFRESH_TOKEN } = LS_KEYS
 
 // Track if we're currently refreshing to prevent multiple simultaneous refresh requests
 let isRefreshing = false
@@ -25,7 +27,7 @@ const processQueue = (error, token = null) => {
 }
 
 axiosIns.interceptors.request.use((config) => {
-	const token = localStorage.getItem('cn_access_token')
+	const token = localStorage.getItem(ACCESS_TOKEN)
 	if (token) {
 		config.headers.Authorization = `Bearer ${token}`
 	}
@@ -56,7 +58,7 @@ axiosIns.interceptors.response.use(
 			originalRequest._retry = true
 			isRefreshing = true
 
-			const refreshToken = localStorage.getItem('cn_refresh_token')
+			const refreshToken = localStorage.getItem(REFRESH_TOKEN)
 
 			if (!refreshToken) {
 				// No refresh token, logout user
