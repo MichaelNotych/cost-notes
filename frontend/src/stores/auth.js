@@ -3,7 +3,7 @@ import axiosIns from '@/plugins/axios'
 import { toast } from '@/plugins/toast'
 import { LS_KEYS } from '@/constants'
 
-const { USER, ACCESS_TOKEN, REFRESH_TOKEN } = LS_KEYS
+const { USER, ACCESS_TOKEN, REFRESH_TOKEN, CATEGORIES } = LS_KEYS
 
 export const useAuthStore = defineStore('auth', {
 	state: () => ({
@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', {
 				localStorage.setItem(USER, JSON.stringify(user))
 			} else {
 				localStorage.removeItem(USER)
+				localStorage.removeItem(CATEGORIES)
 			}
 
 			if (accessToken) {

@@ -1,15 +1,8 @@
+const mongoose = require("mongoose");
 const { Expense } = require("../models");
-const { googleApiKey } = require("../config/config");
-const { GoogleGenAI } = require("@google/genai");
-const { parseExpensePrompt } = require("../config/prompts");
 const ApiError = require("../utils/ApiError");
 const { status } = require("http-status");
-const categoryService = require("./category.service");
 const rateService = require("./rate.service");
-const logger = require("../config/logger");
-const { parseAiJson } = require("../utils/ai");
-
-const ai = new GoogleGenAI({ apiKey: googleApiKey });
 
 /**
  * Internal helper to create and save an expense record with currency conversion and population.
@@ -34,59 +27,6 @@ const _saveExpenseRecord = async (expenseData, userId) => {
     });
 
     return Expense.findById(expense._id).populate("category");
-};
-
-/**
- * Add an expense by parsing user description with AI.
- */
-const addExpense = async (expense, userId) => {
-    const prompt = parseExpensePrompt(expense.userDescription);
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-    });
-
-    const expenseObject = parseAiJson(response.text);
-
-    if (
-        !expenseObject ||
-        !expenseObject.amount ||
-        !expenseObject.currency ||
-        !expenseObject.title ||
-        !expenseObject.category
-    ) {
-        throw new ApiError(
-            status.BAD_REQUEST,
-            "Invalid or incomplete AI response"
-        );
-    }
-
-    logger.info(
-        `AI parsing successful for user: ${userId}. Extracted: ${JSON.stringify(
-            expenseObject
-        )}`
-    );
-
-    // Get or create category
-    let category = await categoryService.getCategoryByName(
-        expenseObject.category,
-        userId
-    );
-    if (!category) {
-        category = await categoryService.createCategory(
-            { name: expenseObject.category },
-            userId
-        );
-    }
-
-    return _saveExpenseRecord(
-        {
-            ...expenseObject,
-            category: category._id,
-            userDescription: expense.userDescription,
-        },
-        userId
-    );
 };
 
 /**
@@ -172,16 +112,47 @@ const deleteExpense = async (expenseId) => {
 };
 
 /**
- * Add an expense manually with pre-filled details.
+ * Add an expense.
  */
-const addManualExpense = async (expenseData, userId) => {
+const addExpense = async (expenseData, userId) => {
     return _saveExpenseRecord(expenseData, userId);
+};
+
+/**
+ * Get per-day expense totals for a date range, grouped by the given timezone's calendar day.
+ */
+const getDailyTotals = async (userId, { startDate, endDate, tz = "+00:00" } = {}) => {
+    const safeTz = /^[+-]\d{2}:\d{2}$/.test(tz) ? tz : "+00:00";
+    const match = { userId: new mongoose.Types.ObjectId(userId) };
+
+    if (startDate || endDate) {
+        match.createdAt = {};
+        if (startDate) match.createdAt.$gte = new Date(startDate);
+        if (endDate) match.createdAt.$lte = new Date(endDate);
+    }
+
+    return Expense.aggregate([
+        { $match: match },
+        {
+            $group: {
+                _id: {
+                    $dateToString: {
+                        format: "%Y-%m-%d",
+                        date: "$createdAt",
+                        timezone: safeTz,
+                    },
+                },
+                total: { $sum: "$defaultCurrencyAmount" },
+            },
+        },
+        { $project: { _id: 0, date: "$_id", total: 1 } },
+    ]);
 };
 
 module.exports = {
     addExpense,
     getExpenses,
+    getDailyTotals,
     editExpense,
     deleteExpense,
-    addManualExpense,
 };

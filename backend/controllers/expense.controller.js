@@ -3,7 +3,6 @@ const catchAsync = require("../utils/catchAsync");
 const {expenseService} = require("../services");
 
 const addExpense = catchAsync(async (req, res) => {
-    console.log(req.body, req.userId)
     const expense = await expenseService.addExpense(req.body, req.userId);
     res.status(status.CREATED).json(expense);
 });
@@ -30,9 +29,10 @@ const getExpenses = catchAsync(async (req, res) => {
     res.status(status.OK).json(result);
 });
 
-const addManualExpense = catchAsync(async (req, res) => {
-    const expense = await expenseService.addManualExpense(req.body, req.userId);
-    res.status(status.CREATED).json(expense);
+const getDailyTotals = catchAsync(async (req, res) => {
+    const { startDate, endDate, tz } = req.query;
+    const totals = await expenseService.getDailyTotals(req.userId, { startDate, endDate, tz });
+    res.status(status.OK).json(totals);
 });
 
-module.exports = { addExpense, editExpense, deleteExpense, getExpenses, addManualExpense };
+module.exports = { addExpense, editExpense, deleteExpense, getExpenses, getDailyTotals };

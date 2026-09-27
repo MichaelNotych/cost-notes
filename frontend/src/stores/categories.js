@@ -1,15 +1,28 @@
 import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
 import { toast } from '@/plugins/toast'
+import { LS_KEYS } from '@/constants'
+
+const loadCachedCategories = () => {
+	try {
+		return JSON.parse(localStorage.getItem(LS_KEYS.CATEGORIES)) || []
+	} catch {
+		return []
+	}
+}
 
 export const useCategoriesStore = defineStore('categories', {
 	state: () => ({
-		categories: [],
+		categories: loadCachedCategories(),
 		error: null,
 		loading: false,
 	}),
 
 	actions: {
+		persist() {
+			localStorage.setItem(LS_KEYS.CATEGORIES, JSON.stringify(this.categories))
+		},
+
 		/**
 		 * Fetch all user categories
 		 */
@@ -19,6 +32,7 @@ export const useCategoriesStore = defineStore('categories', {
 			try {
 				const response = await axiosIns.get('/categories')
 				this.categories = response.data
+				this.persist()
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to fetch categories'
@@ -36,6 +50,7 @@ export const useCategoriesStore = defineStore('categories', {
 			try {
 				const response = await axiosIns.post('/category', categoryData)
 				this.categories.push(response.data)
+				this.persist()
 				toast.success('Category added successfully')
 				return response.data
 			} catch (err) {
@@ -60,6 +75,7 @@ export const useCategoriesStore = defineStore('categories', {
 				if (index !== -1) {
 					this.categories[index] = updatedCategory
 				}
+				this.persist()
 				toast.success('Category updated successfully')
 				return updatedCategory
 			} catch (err) {
@@ -79,6 +95,7 @@ export const useCategoriesStore = defineStore('categories', {
 			try {
 				await axiosIns.delete(`/category/${id}`)
 				this.categories = this.categories.filter((c) => c._id !== id)
+				this.persist()
 				toast.success('Category deleted successfully')
 			} catch (err) {
 				console.error(err)

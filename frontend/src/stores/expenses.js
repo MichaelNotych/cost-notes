@@ -17,6 +17,20 @@ const mergeExpenses = (existing, incoming) => {
 	return Array.from(map.values())
 }
 
+// Returns a "YYYY-MM-DD" key for a date in local time
+const localDateKey = (date) => {
+	const d = new Date(date)
+	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+// Returns the browser's UTC offset as a fixed "+HH:MM"/"-HH:MM" string
+const tzOffsetString = () => {
+	const minutes = -new Date().getTimezoneOffset()
+	const sign = minutes >= 0 ? '+' : '-'
+	const abs = Math.abs(minutes)
+	return `${sign}${String(Math.floor(abs / 60)).padStart(2, '0')}:${String(abs % 60).padStart(2, '0')}`
+}
+
 // Returns a "<emoji> <name>" string for grouping category buckets
 const getCategoryKey = (category) => {
 	const name = typeof category === 'object' ? category?.name || 'Uncategorized' : 'Uncategorized'
@@ -54,6 +68,9 @@ export const useExpensesStore = defineStore('expenses', {
 		totalPages: 1,
 		currentPage: 1,
 		isLoadingCalendar: false,
+		calendarTotals: {},
+		dayExpenses: {},
+		isLoadingDayExpenses: false,
 	}),
 
 	getters: {
@@ -267,37 +284,21 @@ export const useExpensesStore = defineStore('expenses', {
 			this.error = null
 			this.isAddingExpense = true
 			try {
-				const response = await axiosIns.post('/expense', {
-					userDescription: expenseData,
-				})
+				const response = await axiosIns.post('/expense', expenseData)
 				this.allExpenses.push(response.data)
+
+				const dateKey = localDateKey(response.data.createdAt)
+				this.calendarTotals[dateKey] =
+					(this.calendarTotals[dateKey] || 0) + (response.data.defaultCurrencyAmount || 0)
+				if (this.dayExpenses[dateKey]) {
+					this.dayExpenses[dateKey] = [...this.dayExpenses[dateKey], response.data]
+				}
+
 				toast.success('Expense added successfully')
 				return response.data
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add expense'
-				toast.error(this.error)
-				throw err
-			} finally {
-				this.isAddingExpense = false
-			}
-		},
-
-		/**
-		 * Create a new manual expense
-		 * @param {Object} expenseData
-		 */
-		async addManualExpense(expenseData) {
-			this.error = null
-			this.isAddingExpense = true
-			try {
-				const response = await axiosIns.post('/manual-expense', expenseData)
-				this.allExpenses.push(response.data)
-				toast.success('Expense added successfully')
-				return response.data
-			} catch (err) {
-				console.error(err)
-				this.error = err.response?.data?.message || 'Failed to add manual expense'
 				toast.error(this.error)
 				throw err
 			} finally {
@@ -313,12 +314,29 @@ export const useExpensesStore = defineStore('expenses', {
 		async updateExpense(id, expenseData) {
 			this.error = null
 			try {
+				const oldExpense = this.allExpenses.find((e) => e._id === id)
 				const response = await axiosIns.put(`/expense/${id}`, expenseData)
 				const updatedExpense = response.data
 				const index = this.allExpenses.findIndex((e) => e._id === id)
 				if (index !== -1) {
 					this.allExpenses[index] = updatedExpense
 				}
+
+				if (oldExpense) {
+					const oldKey = localDateKey(oldExpense.createdAt)
+					this.calendarTotals[oldKey] =
+						(this.calendarTotals[oldKey] || 0) - (oldExpense.defaultCurrencyAmount || 0)
+					if (this.dayExpenses[oldKey]) {
+						this.dayExpenses[oldKey] = this.dayExpenses[oldKey].filter((e) => e._id !== id)
+					}
+				}
+				const newKey = localDateKey(updatedExpense.createdAt)
+				this.calendarTotals[newKey] =
+					(this.calendarTotals[newKey] || 0) + (updatedExpense.defaultCurrencyAmount || 0)
+				if (this.dayExpenses[newKey]) {
+					this.dayExpenses[newKey] = [...this.dayExpenses[newKey], updatedExpense]
+				}
+
 				toast.success('Expense updated successfully')
 				return updatedExpense
 			} catch (err) {
@@ -329,31 +347,56 @@ export const useExpensesStore = defineStore('expenses', {
 			}
 		},
 
-		async fetchCalendarExpenses(startDate, endDate) {
+		async fetchCalendarTotals(startDate, endDate) {
 			this.isLoadingCalendar = true
 			try {
-				const response = await axiosIns.get('/expenses', {
-					params: { startDate, endDate, limit: 2000 },
+				const response = await axiosIns.get('/expenses/totals', {
+					params: { startDate, endDate, tz: tzOffsetString() },
 				})
-				this.allExpenses = mergeExpenses(this.allExpenses, response.data.expenses)
+				response.data.forEach(({ date, total }) => {
+					this.calendarTotals[date] = total
+				})
 			} catch (err) {
 				console.error(err)
-				this.error = err.response?.data?.message || 'Failed to fetch calendar expenses'
+				this.error = err.response?.data?.message || 'Failed to fetch calendar totals'
 			} finally {
 				this.isLoadingCalendar = false
 			}
 		},
 
-		async appendCalendarExpenses(startDate, endDate) {
+		async appendCalendarTotals(startDate, endDate) {
 			try {
-				const response = await axiosIns.get('/expenses', {
-					params: { startDate, endDate, limit: 2000 },
+				const response = await axiosIns.get('/expenses/totals', {
+					params: { startDate, endDate, tz: tzOffsetString() },
 				})
-				this.allExpenses = mergeExpenses(this.allExpenses, response.data.expenses)
-				return response.data.expenses.length
+				response.data.forEach(({ date, total }) => {
+					this.calendarTotals[date] = total
+				})
+				return response.data.length
 			} catch (err) {
 				console.error(err)
 				return 0
+			}
+		},
+
+		async fetchDayExpenses(dateKey) {
+			if (this.dayExpenses[dateKey]) return this.dayExpenses[dateKey]
+			this.isLoadingDayExpenses = true
+			try {
+				const [y, m, d] = dateKey.split('-').map(Number)
+				const startDate = new Date(y, m - 1, d, 0, 0, 0, 0).toISOString()
+				const endDate = new Date(y, m - 1, d, 23, 59, 59, 999).toISOString()
+				const response = await axiosIns.get('/expenses', {
+					params: { startDate, endDate, limit: 500 },
+				})
+				this.dayExpenses[dateKey] = response.data.expenses
+				return this.dayExpenses[dateKey]
+			} catch (err) {
+				console.error(err)
+				this.error = err.response?.data?.message || 'Failed to fetch day expenses'
+				return []
+			} finally {
+				this.isLoadingDayExpenses = false
 			}
 		},
 
@@ -364,8 +407,19 @@ export const useExpensesStore = defineStore('expenses', {
 		async deleteExpense(id) {
 			this.error = null
 			try {
+				const expense = this.allExpenses.find((e) => e._id === id)
 				await axiosIns.delete(`/expense/${id}`)
 				this.allExpenses = this.allExpenses.filter((e) => e._id !== id)
+
+				if (expense) {
+					const dateKey = localDateKey(expense.createdAt)
+					this.calendarTotals[dateKey] =
+						(this.calendarTotals[dateKey] || 0) - (expense.defaultCurrencyAmount || 0)
+					if (this.dayExpenses[dateKey]) {
+						this.dayExpenses[dateKey] = this.dayExpenses[dateKey].filter((e) => e._id !== id)
+					}
+				}
+
 				toast.success('Expense deleted successfully')
 			} catch (err) {
 				console.error(err)

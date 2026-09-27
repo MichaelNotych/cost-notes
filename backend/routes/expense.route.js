@@ -31,11 +31,10 @@ router.get(
   expenseController.getExpenses
 );
 
-router.post(
-  "/manual-expense",
+router.get(
+  "/expenses/totals",
   auth,
-  validate(expenseValidation.addManualExpenseSchema),
-  expenseController.addManualExpense
+  expenseController.getDailyTotals
 );
 
 module.exports = router;

@@ -54,7 +54,7 @@ const handleSave = async () => {
 		const [y, m, d] = selectedDateStr.value.split('-').map(Number)
 		const now = new Date()
 		const createdAt = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds())
-		await expensesStore.addManualExpense({
+		await expensesStore.addExpense({
 			title: note.value.trim() || `${currencySymbol.value}${amountStr.value}`,
 			amount: parseFloat(amountStr.value),
 			currency: selectedCurrency.value,

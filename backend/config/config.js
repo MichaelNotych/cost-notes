@@ -11,7 +11,6 @@ module.exports = {
 	dbConnection: envVars.DB_CONNECTION,
 	env: envVars.NODE_ENV,
 	jwtSecret: envVars.JWT_SECRET,
-	googleApiKey: envVars.GOOGLE_API_KEY,
 	exchangeRateApiKey: envVars.EXCHANGE_RATE_API_KEY,
 	clientUrl: envVars.CLIENT_URL,
 };

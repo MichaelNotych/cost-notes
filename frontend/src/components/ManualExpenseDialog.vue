@@ -1,15 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-import { LS_KEYS } from '@/constants'
 import CloseIcon from './icons/CloseIcon.vue'
-import AiExpenseForm from './AiExpenseForm.vue'
 import ManualExpenseForm from './ManualExpenseForm.vue'
-import AiIcon from './icons/AiIcon.vue'
-
-const { LAST_MODE } = LS_KEYS
 
 const isOpen = ref(false)
-const isAiMode = ref(localStorage.getItem(LAST_MODE) === 'ai')
 const selectedDateStr = ref('')
 const openCount = ref(0)
 
@@ -29,11 +23,6 @@ const open = (date, _isWeek = false) => {
 
 const close = () => {
 	isOpen.value = false
-}
-
-const handleExpenseFormToggle = () => {
-	isAiMode.value = !isAiMode.value
-	localStorage.setItem(LAST_MODE, isAiMode.value ? 'ai' : 'manual')
 }
 
 defineExpose({ open })
@@ -74,14 +63,6 @@ defineExpose({ open })
 				<div class="bg-zinc-900 w-full max-w-2xl rounded-t-3xl overflow-hidden" @click.stop>
 					<!-- Header -->
 					<header class="flex items-center justify-between px-5 py-2">
-						<button
-							@click="handleExpenseFormToggle"
-							class="p-2 -ml-2 transition-colors"
-							:class="isAiMode ? 'text-sky-400' : 'text-zinc-400 hover:text-white'"
-						>
-							<!-- AI sparkle icon -->
-							<AiIcon />
-						</button>
 						<span class="font-semibold text-white text-base">New expense</span>
 						<button
 							@click="close"
@@ -91,10 +72,8 @@ defineExpose({ open })
 						</button>
 					</header>
 
-					<AiExpenseForm v-if="isAiMode" :key="openCount" @done="close" />
 					<ManualExpenseForm
-						v-else
-						:key="openCount + 1"
+						:key="openCount"
 						:initial-date="selectedDateStr"
 						@done="close"
 					/>

@@ -18,15 +18,7 @@ let observer = null
 
 const today = new Date()
 
-const dayTotals = computed(() => {
-	const map = {}
-	expensesStore.allExpenses.forEach((expense) => {
-		const d = new Date(expense.createdAt)
-		const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-		map[key] = (map[key] || 0) + (expense.defaultCurrencyAmount || 0)
-	})
-	return map
-})
+const dayTotals = computed(() => expensesStore.calendarTotals)
 
 const maxDailyAmount = computed(() => {
 	const vals = Object.values(dayTotals.value)
@@ -89,12 +81,12 @@ const selectedDayKey = ref(null)
 
 const selectedDayExpenses = computed(() => {
 	if (!selectedDayKey.value) return []
-	return expensesStore.allExpenses.filter((e) => {
-		const d = new Date(e.createdAt)
-		const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-		return k === selectedDayKey.value
-	})
+	return expensesStore.dayExpenses[selectedDayKey.value] || []
 })
+
+const isLoadingSelectedDay = computed(
+	() => expensesStore.isLoadingDayExpenses && !expensesStore.dayExpenses[selectedDayKey.value],
+)
 
 const selectedDayTotal = computed(() =>
 	selectedDayExpenses.value.reduce((s, e) => s + (e.defaultCurrencyAmount || 0), 0),
@@ -110,9 +102,10 @@ const selectedDayLabel = computed(() => {
 	})
 })
 
-const openDay = (day) => {
+const openDay = async (day) => {
 	if (!day || day.isFuture) return
 	selectedDayKey.value = day.key
+	await expensesStore.fetchDayExpenses(day.key)
 }
 
 const buildMonthsList = (count, fromYear, fromMonth) =>
@@ -139,7 +132,7 @@ const loadMoreMonths = async () => {
 	const nextBatch = buildMonthsList(6, oldest.year, oldest.month - 1)
 	const { startDate, endDate } = rangeForMonths(nextBatch)
 
-	const count = await expensesStore.appendCalendarExpenses(startDate, endDate)
+	const count = await expensesStore.appendCalendarTotals(startDate, endDate)
 
 	if (count === 0) {
 		hasMore.value = false
@@ -156,7 +149,7 @@ onMounted(async () => {
 	displayedMonths.value = initialMonths
 
 	const { startDate, endDate } = rangeForMonths(initialMonths)
-	await expensesStore.fetchCalendarExpenses(startDate, endDate)
+	await expensesStore.fetchCalendarTotals(startDate, endDate)
 
 	await nextTick()
 
@@ -287,7 +280,7 @@ onUnmounted(() => {
 		>
 			<div
 				v-if="selectedDayKey"
-				class="fixed inset-x-0 top-0 bottom-25 z-[60] flex items-end justify-center bg-zinc-950/70 backdrop-blur-sm"
+				class="fixed inset-x-0 top-0 bottom-0 z-60 flex items-end justify-center bg-zinc-950/70 backdrop-blur-sm"
 				@click.self="selectedDayKey = null"
 			>
 				<Transition
@@ -325,8 +318,13 @@ onUnmounted(() => {
 							</AppButton>
 						</header>
 
-						<div class="overflow-y-auto max-h-72 px-2 py-1">
-							<template v-if="selectedDayExpenses.length > 0">
+						<div class="overflow-y-auto max-h-72 px-2 py-1 pb-8">
+							<div v-if="isLoadingSelectedDay" class="flex justify-center py-6">
+								<div
+									class="w-5 h-5 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"
+								></div>
+							</div>
+							<template v-else-if="selectedDayExpenses.length > 0">
 								<DailyExpense
 									v-for="expense in selectedDayExpenses"
 									:key="expense._id"
