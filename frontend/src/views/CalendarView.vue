@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, computed, ref, nextTick } from 'vue'
+import { onMounted, onUnmounted, onActivated, computed, ref, nextTick } from 'vue'
 import { useExpensesStore } from '@/stores/expenses'
 import { useNumberFormat } from '@/composables/useNumberFormat'
 import DailyExpense from '@/components/DailyExpense.vue'
@@ -9,7 +9,7 @@ import BottomSheet from '@/components/BottomSheet.vue'
 const expensesStore = useExpensesStore()
 const { fmtCompact, formatAmount } = useNumberFormat()
 
-const displayedMonths = ref([]) // [{year, month}], newest first
+const displayedMonths = ref([]) // [{year, month}], oldest first (current month at the bottom)
 const isLoadingMore = ref(false)
 const hasMore = ref(true)
 const sentinel = ref(null)
@@ -81,6 +81,7 @@ const isDayOpen = ref(false)
 
 // Cached totals are shown immediately; the spinner is only for a cold start
 const hasCalendarData = computed(() => Object.keys(dayTotals.value).length > 0)
+const isInitialLoading = computed(() => expensesStore.isLoadingCalendar && !hasCalendarData.value)
 
 const selectedDayExpenses = computed(() => {
 	if (!selectedDayKey.value) return []
@@ -128,12 +129,26 @@ const rangeForMonths = (months) => {
 	}
 }
 
+const scrollToBottom = () => window.scrollTo(0, document.documentElement.scrollHeight)
+
+// Older months are inserted above the viewport; shift the scroll by the added height so the
+// visible months stay in place (browser scroll anchoring is off so it doesn't double-adjust)
+const prependMonths = async (months) => {
+	const root = document.documentElement
+	const prevHeight = root.scrollHeight
+	root.style.overflowAnchor = 'none'
+	displayedMonths.value.unshift(...months)
+	await nextTick()
+	window.scrollBy(0, root.scrollHeight - prevHeight)
+	root.style.overflowAnchor = ''
+}
+
 const loadMoreMonths = async () => {
 	if (isLoadingMore.value || expensesStore.isLoadingCalendar || !hasMore.value) return
 	isLoadingMore.value = true
 
-	const oldest = displayedMonths.value[displayedMonths.value.length - 1]
-	const nextBatch = buildMonthsList(6, oldest.year, oldest.month - 1)
+	const oldest = displayedMonths.value[0]
+	const nextBatch = buildMonthsList(6, oldest.year, oldest.month - 1).reverse()
 	const { startDate, endDate } = rangeForMonths(nextBatch)
 
 	const count = await expensesStore.appendCalendarTotals(startDate, endDate)
@@ -142,20 +157,31 @@ const loadMoreMonths = async () => {
 		hasMore.value = false
 		observer?.disconnect()
 	} else {
-		displayedMonths.value.push(...nextBatch)
+		await prependMonths(nextBatch)
 	}
 
 	isLoadingMore.value = false
 }
 
 onMounted(async () => {
-	const initialMonths = buildMonthsList(6, today.getFullYear(), today.getMonth())
+	const initialMonths = buildMonthsList(6, today.getFullYear(), today.getMonth()).reverse()
 	displayedMonths.value = initialMonths
+
+	// Cached totals render right away, so start at the current month before the refresh
+	let scrolled = false
+	await nextTick()
+	if (hasCalendarData.value) {
+		scrollToBottom()
+		scrolled = true
+	}
 
 	const { startDate, endDate } = rangeForMonths(initialMonths)
 	await expensesStore.fetchCalendarTotals(startDate, endDate)
 
 	await nextTick()
+	if (!scrolled) scrollToBottom()
+
+	// Observe only once we're at the bottom, so the top sentinel doesn't fire straight away
 
 	observer = new IntersectionObserver(
 		(entries) => {
@@ -166,34 +192,29 @@ onMounted(async () => {
 	if (sentinel.value) observer.observe(sentinel.value)
 })
 
+// The tab is kept alive between switches; always come back to the current month
+onActivated(scrollToBottom)
+
 onUnmounted(() => {
 	observer?.disconnect()
 })
 </script>
 
 <template>
-	<div class="flex flex-col flex-1 overflow-y-auto scrollbar-hide">
-		<!-- Header -->
-		<div class="flex items-center justify-between mb-4">
-			<h1 class="text-2xl font-semibold text-white">Calendar</h1>
-			<p class="text-xs text-sky-400 font-mono">
-				{{ formatAmount(periodTotal) }} {{ expensesStore.defaultCurrency }}
-			</p>
-		</div>
-
-		<!-- Initial loading -->
+	<div class="flex flex-col flex-1">
+		<!-- Header + legend stay visible while scrolling back through older months -->
 		<div
-			v-if="expensesStore.isLoadingCalendar && !hasCalendarData"
-			class="flex justify-center py-12"
+			class="sticky top-[env(safe-area-inset-top)] z-20 -mx-4 px-4 pt-2 -mt-2 bg-zinc-800/90 backdrop-blur-md"
 		>
-			<div
-				class="w-8 h-8 border-4 border-sky-600 border-t-transparent rounded-full animate-spin"
-			></div>
-		</div>
+			<div class="flex items-center justify-between mb-2">
+				<h1 class="text-2xl font-semibold text-white">Calendar</h1>
+				<p class="text-xs text-sky-400 font-mono">
+					{{ formatAmount(periodTotal) }} {{ expensesStore.defaultCurrency }}
+				</p>
+			</div>
 
-		<template v-else>
 			<!-- Legend -->
-			<div class="flex items-center gap-2 pt-2 pb-4">
+			<div v-if="!isInitialLoading" class="flex items-center gap-2 pt-2 pb-3">
 				<span class="text-xs text-zinc-500">$0</span>
 				<div class="flex gap-0.5 flex-1">
 					<div
@@ -213,10 +234,28 @@ onUnmounted(() => {
 				</div>
 				<span class="text-xs text-zinc-500">${{ fmtCompact(maxDailyAmount) }}</span>
 			</div>
+		</div>
 
-			<!-- Month blocks -->
-			<div class="space-y-6 pb-4">
-				<div v-for="(month, mi) in monthsData" :key="mi">
+		<!-- Initial loading -->
+		<div v-if="isInitialLoading" class="flex justify-center py-12">
+			<div
+				class="w-8 h-8 border-4 border-sky-600 border-t-transparent rounded-full animate-spin"
+			></div>
+		</div>
+
+		<template v-else>
+			<!-- Month blocks: oldest at the top, current month at the bottom -->
+			<div class="space-y-6 pt-2 pb-4">
+				<!-- Sentinel + loading more indicator: scrolling up loads older months -->
+				<div ref="sentinel" class="flex justify-center py-4">
+					<div
+						v-if="isLoadingMore"
+						class="w-6 h-6 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"
+					></div>
+					<p v-else-if="!hasMore" class="text-xs text-zinc-600">No more expenses</p>
+				</div>
+
+				<div v-for="month in monthsData" :key="month.name">
 					<!-- Month header -->
 					<div class="flex items-baseline justify-between mb-2">
 						<h3 class="text-sm font-medium text-zinc-300 uppercase tracking-wide">
@@ -264,15 +303,6 @@ onUnmounted(() => {
 						</div>
 					</div>
 				</div>
-
-				<!-- Sentinel + loading more indicator -->
-				<div ref="sentinel" class="flex justify-center py-4">
-					<div
-						v-if="isLoadingMore"
-						class="w-6 h-6 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"
-					></div>
-					<p v-else-if="!hasMore" class="text-xs text-zinc-600">No more expenses</p>
-				</div>
 			</div>
 		</template>
 
@@ -306,13 +336,3 @@ onUnmounted(() => {
 		</BottomSheet>
 	</div>
 </template>
-
-<style scoped>
-.scrollbar-hide::-webkit-scrollbar {
-	display: none;
-}
-.scrollbar-hide {
-	-ms-overflow-style: none;
-	scrollbar-width: none;
-}
-</style>

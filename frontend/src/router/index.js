@@ -7,13 +7,11 @@ import WeekView from '@/views/WeekView.vue'
 import CalendarView from '@/views/CalendarView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 
-// Per-tab scroll positions, so switching tabs returns to where you left off
-const scrollPositions = {}
-
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
-	scrollBehavior: (to, _from, savedPosition) =>
-		savedPosition || { top: scrollPositions[to.path] ?? 0 },
+	// Every tab opens at the top,
+	// the calendar always opens at the bottom
+	scrollBehavior: (to) => (to.meta.managesScroll ? false : { top: 0 }),
 	routes: [
 		{
 			path: '/auth',
@@ -36,7 +34,7 @@ const router = createRouter({
 			path: '/calendar',
 			name: 'CalendarView',
 			component: CalendarView,
-			meta: { requiresAuth: true },
+			meta: { requiresAuth: true, managesScroll: true },
 		},
 		{
 			path: '/settings',
@@ -48,8 +46,6 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-	scrollPositions[from.path] = window.scrollY
-
 	const authStore = useAuthStore()
 	if (to.meta.requiresAuth) {
 		if (authStore.isAuthenticated) {
