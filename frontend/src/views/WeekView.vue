@@ -65,7 +65,10 @@ onMounted(async () => {
 					</div>
 				</button>
 
-				<div v-if="openWeeks.has(week.id)" class="py-2 border-t border-zinc-700/20">
+				<div
+					v-if="openWeeks.has(week.id)"
+					class="py-2 border-t border-zinc-700/20 divide-y divide-zinc-700/30"
+				>
 					<div v-for="(amount, category) in week.categories" :key="category">
 						<DailyExpense
 							:expense="{

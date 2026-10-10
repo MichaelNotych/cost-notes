@@ -4,24 +4,42 @@ import { useExpensesStore } from '@/stores/expenses'
 import { useCategoriesStore } from '@/stores/categories'
 import { LS_KEYS, CURRENCIES } from '@/constants'
 import BackspaceIcon from './icons/BackspaceIcon.vue'
+import TrashIcon from './icons/TrashIcon.vue'
 import AppInput from '@/components/atoms/AppInput.vue'
 import AppButton from '@/components/atoms/AppButton.vue'
 import getCurrencySymbolFromCode from '@/plugins/currencies'
 
 const props = defineProps({
-	initialDate: { type: String, required: true },
+	initialDate: { type: String, default: '' },
+	// When provided, the form edits this expense instead of creating a new one
+	expense: { type: Object, default: null },
 })
 const emit = defineEmits(['done'])
 
 const expensesStore = useExpensesStore()
 const categoriesStore = useCategoriesStore()
 
-const amountStr = ref('0')
-const note = ref('')
-const selectedCategory = ref(categoriesStore.categories[0]?._id || null)
-const selectedCurrency = ref(localStorage.getItem(LS_KEYS.LAST_CURRENCY) || 'USD')
-const selectedDateStr = ref(props.initialDate)
+const toInputDate = (date) => {
+	const d = new Date(date)
+	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+const isEditing = computed(() => !!props.expense)
+
+const amountStr = ref(props.expense ? String(Number(props.expense.amount) || 0) : '0')
+const note = ref(props.expense?.title || props.expense?.userDescription || '')
+const selectedCategory = ref(
+	props.expense
+		? props.expense.category?._id || props.expense.category
+		: categoriesStore.categories[0]?._id || null,
+)
+const selectedCurrency = ref(
+	props.expense?.currency || localStorage.getItem(LS_KEYS.LAST_CURRENCY) || 'USD',
+)
+const initialDateStr = props.expense ? toInputDate(props.expense.createdAt) : props.initialDate
+const selectedDateStr = ref(initialDateStr)
 const isSubmitting = ref(false)
+const isDeleting = ref(false)
 
 const currencySymbol = computed(
 	() => getCurrencySymbolFromCode(selectedCurrency.value) || selectedCurrency.value,
@@ -46,26 +64,51 @@ const pressKey = (key) => {
 	amountStr.value = amountStr.value === '0' ? key : amountStr.value + key
 }
 
+// Selected day, keeping the time of day from `base`
+const dateWithTimeOf = (base) => {
+	const [y, m, d] = selectedDateStr.value.split('-').map(Number)
+	const date = new Date(base)
+	date.setFullYear(y, m - 1, d)
+	return date
+}
+
 const handleSave = async () => {
 	if (!canSave.value || isSubmitting.value) return
 	isSubmitting.value = true
 	try {
 		localStorage.setItem(LS_KEYS.LAST_CURRENCY, selectedCurrency.value)
-		const [y, m, d] = selectedDateStr.value.split('-').map(Number)
-		const now = new Date()
-		const createdAt = new Date(y, m - 1, d, now.getHours(), now.getMinutes(), now.getSeconds())
-		await expensesStore.addExpense({
+		const data = {
 			title: note.value.trim() || `${currencySymbol.value}${amountStr.value}`,
 			amount: parseFloat(amountStr.value),
 			currency: selectedCurrency.value,
 			category: selectedCategory.value,
-			createdAt,
-		})
+		}
+		if (isEditing.value) {
+			if (selectedDateStr.value !== initialDateStr) {
+				data.createdAt = dateWithTimeOf(props.expense.createdAt)
+			}
+			await expensesStore.updateExpense(props.expense._id, data)
+		} else {
+			await expensesStore.addExpense({ ...data, createdAt: dateWithTimeOf(new Date()) })
+		}
 		emit('done')
 	} catch {
 		// toast shown by store
 	} finally {
 		isSubmitting.value = false
+	}
+}
+
+const handleDelete = async () => {
+	if (isDeleting.value) return
+	isDeleting.value = true
+	emit('done')
+	try {
+		await expensesStore.deleteExpense(props.expense._id)
+	} catch {
+		// toast shown by store
+	} finally {
+		isDeleting.value = false
 	}
 }
 </script>
@@ -76,7 +119,7 @@ const handleSave = async () => {
 		<label class="currency-picker relative">
 			<select
 				v-model="selectedCurrency"
-				class="appearance-none bg-zinc-800 text-white text-sm font-medium pl-7 pr-7 py-1.5 rounded-full border border-zinc-700 focus:outline-none focus:border-sky-500 transition-colors cursor-pointer"
+				class="appearance-none bg-zinc-800 text-white text-base font-medium pl-7 pr-7 py-1.5 rounded-full border border-zinc-700 focus:outline-none focus:border-sky-500 transition-colors cursor-pointer"
 			>
 				<option v-for="c in CURRENCIES" :key="c" :value="c">
 					{{ c }}
@@ -128,7 +171,7 @@ const handleSave = async () => {
 				v-for="cat in categoriesStore.categories"
 				:key="cat._id"
 				@click="selectedCategory = cat._id"
-				class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors"
+				class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition active:scale-95"
 				:class="
 					selectedCategory === cat._id
 						? 'bg-sky-600 text-white'
@@ -147,7 +190,7 @@ const handleSave = async () => {
 			v-for="key in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫']"
 			:key="key"
 			@click="pressKey(key)"
-			class="bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white text-2xl font-light rounded-2xl h-14 flex items-center justify-center transition-colors select-none touch-manipulation"
+			class="bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 active:scale-95 text-white text-2xl font-light rounded-2xl h-14 flex items-center justify-center transition select-none touch-manipulation"
 		>
 			<template v-if="key === '⌫'">
 				<BackspaceIcon class="w-6 h-6" />
@@ -156,15 +199,26 @@ const handleSave = async () => {
 		</button>
 	</div>
 
-	<!-- Save button -->
-	<div class="px-4 pb-10">
+	<!-- Actions -->
+	<div class="flex gap-2 px-4 pb-4">
+		<AppButton
+			v-if="isEditing"
+			variant="danger"
+			size="xl"
+			rounded="2xl"
+			:loading="isDeleting"
+			aria-label="Delete expense"
+			@click="handleDelete"
+		>
+			<TrashIcon class="size-6" />
+		</AppButton>
 		<AppButton
 			variant="primary"
 			:disabled="!canSave"
 			:loading="isSubmitting"
 			size="xl"
 			rounded="2xl"
-			class="w-full"
+			class="flex-1"
 			@click="handleSave"
 		>
 			<span :class="`${isSubmitting ? 'opacity-0 w-0' : ''}`">Save</span>

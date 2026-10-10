@@ -1,1 +1,42 @@
 @import 'tailwindcss';
+
+@layer base {
+	html {
+		color-scheme: dark;
+		background-color: var(--color-zinc-800);
+		-webkit-tap-highlight-color: transparent;
+		-webkit-text-size-adjust: 100%;
+		/* No rubber-band bounce / browser pull-to-refresh */
+		overscroll-behavior: none;
+	}
+
+	body {
+		margin: 0;
+		padding: 0;
+		min-height: 100dvh;
+		background-color: var(--color-zinc-800);
+		color: var(--color-gray-300);
+		overscroll-behavior: none;
+		/* App-like touch: no text selection, no long-press callout, no double-tap zoom */
+		-webkit-user-select: none;
+		user-select: none;
+		-webkit-touch-callout: none;
+		touch-action: manipulation;
+	}
+
+	input,
+	textarea,
+	select {
+		-webkit-user-select: text;
+		user-select: text;
+	}
+}
+
+@utility scrollbar-hide {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}

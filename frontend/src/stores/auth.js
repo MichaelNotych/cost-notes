@@ -2,8 +2,9 @@ import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
 import { toast } from '@/plugins/toast'
 import { LS_KEYS } from '@/constants'
+import { useExpensesStore } from '@/stores/expenses'
 
-const { USER, ACCESS_TOKEN, REFRESH_TOKEN, CATEGORIES } = LS_KEYS
+const { USER, ACCESS_TOKEN, REFRESH_TOKEN, CATEGORIES, EXPENSES_CACHE } = LS_KEYS
 
 export const useAuthStore = defineStore('auth', {
 	state: () => ({
@@ -22,6 +23,8 @@ export const useAuthStore = defineStore('auth', {
 			} else {
 				localStorage.removeItem(USER)
 				localStorage.removeItem(CATEGORIES)
+				localStorage.removeItem(EXPENSES_CACHE)
+				useExpensesStore().$reset()
 			}
 
 			if (accessToken) {
@@ -47,15 +50,6 @@ export const useAuthStore = defineStore('auth', {
 			if (refreshToken) {
 				localStorage.setItem(REFRESH_TOKEN, refreshToken)
 			}
-		},
-
-		updateSetting(key, value) {
-			if (!this.user) return
-			this.user = {
-				...this.user,
-				settings: { ...this.user.settings, [key]: value },
-			}
-			localStorage.setItem(USER, JSON.stringify(this.user))
 		},
 
 		async logout() {

@@ -1,23 +1,15 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useCategoriesStore } from '@/stores/categories'
-import { useAuthStore } from '@/stores/auth'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
 import CategoryItem from '@/components/CategoryItem.vue'
 import AppForm from '@/components/AppForm.vue'
 import AppButton from '@/components/atoms/AppButton.vue'
-import AppToggle from '@/components/atoms/AppToggle.vue'
 import SpinnerIcon from '@/components/icons/SpinnerIcon.vue'
 import Card from '@/components/Card.vue'
 
 const categoriesStore = useCategoriesStore()
-const authStore = useAuthStore()
-
-const showNavLabels = computed({
-	get: () => authStore.user?.settings?.showNavLabels ?? false,
-	set: (value) => authStore.updateSetting('showNavLabels', value),
-})
 const isCreating = ref(false)
 
 const categorySchema = toTypedSchema(
@@ -59,12 +51,7 @@ const onAddCategory = async (values, { resetForm }) => {
 </script>
 
 <template>
-	<h1 class="text-2xl font-bold mb-4">Settings</h1>
 	<div class="space-y-4">
-		<!-- Appearance -->
-		<div class="mb-12">
-			<AppToggle v-model="showNavLabels" label="Show menu items label" size="xl" />
-		</div>
 		<div v-if="categoriesStore.loading" class="h-30 flex items-center justify-center">
 			<SpinnerIcon />
 		</div>

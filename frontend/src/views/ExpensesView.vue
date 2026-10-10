@@ -5,6 +5,7 @@ import DailyExpenses from '@/components/DailyExpenses.vue'
 import EditExpenseDialog from '@/components/EditExpenseDialog.vue'
 import ManualExpenseDialog from '@/components/ManualExpenseDialog.vue'
 import WeekHeatmap from '@/components/WeekHeatmap.vue'
+import { toast } from '@/plugins/toast'
 
 const expensesStore = useExpensesStore()
 
@@ -12,19 +13,15 @@ const editDialog = ref(null)
 const manualDialog = ref(null)
 
 const handleEdit = (expense) => {
+	if (expense.pending) {
+		toast.info('This expense will be editable once it syncs')
+		return
+	}
 	editDialog.value.open(expense)
 }
 
 const handleAddManual = (date, isWeek = false) => {
 	manualDialog.value.open(date, isWeek)
-}
-
-const handleSave = async ({ id, data }) => {
-	try {
-		await expensesStore.updateExpense(id, data)
-	} catch (err) {
-		console.error('Failed to update expense:', err)
-	}
 }
 
 onMounted(async () => {
@@ -37,7 +34,7 @@ onMounted(async () => {
 		<div class="flex-1 overflow-y-auto scrollbar-hide">
 			<div
 				class="flex justify-center items-center py-8"
-				v-if="expensesStore.isLoadingExpenses"
+				v-if="expensesStore.isLoadingExpenses && expensesStore.groupedExpenses.length === 0"
 			>
 				<div
 					class="w-8 h-8 border-4 border-sky-600 border-t-transparent rounded-full animate-spin"
@@ -66,7 +63,7 @@ onMounted(async () => {
 			</template>
 		</div>
 
-		<EditExpenseDialog ref="editDialog" @save="handleSave" />
+		<EditExpenseDialog ref="editDialog" />
 		<ManualExpenseDialog ref="manualDialog" />
 	</div>
 </template>

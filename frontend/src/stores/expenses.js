@@ -1,6 +1,36 @@
 import { defineStore } from 'pinia'
 import axiosIns from '@/plugins/axios'
 import { toast } from '@/plugins/toast'
+import { LS_KEYS } from '@/constants'
+import { useCategoriesStore } from '@/stores/categories'
+
+const SYNC_TIMEOUT_MS = 15000
+
+const loadCachedExpenses = () => {
+	try {
+		return JSON.parse(localStorage.getItem(LS_KEYS.EXPENSES_CACHE)) || {}
+	} catch {
+		return {}
+	}
+}
+
+// Persist what's needed to render instantly on the next launch (and the offline queue)
+export const persistExpensesCache = ({ allExpenses, calendarTotals, pendingExpenses }) => {
+	try {
+		localStorage.setItem(
+			LS_KEYS.EXPENSES_CACHE,
+			JSON.stringify({ allExpenses, calendarTotals, pendingExpenses }),
+		)
+	} catch (err) {
+		console.error('Failed to persist expenses cache:', err)
+	}
+}
+
+// crypto.randomUUID is unavailable on insecure origins (e.g. testing over LAN http)
+const generateId = () =>
+	crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+
+const isNetworkError = (err) => !err.response
 
 // Returns the Monday (00:00:00) of the week containing `date`
 const getMondayOfWeek = (date) => {
@@ -58,20 +88,26 @@ const groupExpensesByPeriod = (expenses, getPeriod) => {
 }
 
 export const useExpensesStore = defineStore('expenses', {
-	state: () => ({
-		allExpenses: [],
-		error: null,
-		isAddingExpense: false,
-		isLoadingExpenses: false,
-		currentWeekOffset: 0,
-		loadedWeeks: 0,
-		totalPages: 1,
-		currentPage: 1,
-		isLoadingCalendar: false,
-		calendarTotals: {},
-		dayExpenses: {},
-		isLoadingDayExpenses: false,
-	}),
+	state: () => {
+		const cache = loadCachedExpenses()
+		return {
+			allExpenses: cache.allExpenses || [],
+			// Expenses created offline: [{ localId, data }], replayed by syncPending()
+			pendingExpenses: cache.pendingExpenses || [],
+			isSyncing: false,
+			error: null,
+			isAddingExpense: false,
+			isLoadingExpenses: false,
+			currentWeekOffset: 0,
+			loadedWeeks: 0,
+			totalPages: 1,
+			currentPage: 1,
+			isLoadingCalendar: false,
+			calendarTotals: cache.calendarTotals || {},
+			dayExpenses: {},
+			isLoadingDayExpenses: false,
+		}
+	},
 
 	getters: {
 		/**
@@ -246,7 +282,12 @@ export const useExpensesStore = defineStore('expenses', {
 						period: `${requiredWeeks}w`,
 					},
 				})
-				this.allExpenses = mergeExpenses(this.allExpenses, response.data.expenses)
+				// The first fetch replaces the cached snapshot (drops expenses deleted elsewhere)
+				const base =
+					this.loadedWeeks === 0
+						? this.allExpenses.filter((e) => e.pending)
+						: this.allExpenses
+				this.allExpenses = mergeExpenses(base, response.data.expenses)
 				this.totalPages = response.data.totalPages
 				this.currentPage = response.data.currentPage
 				this.loadedWeeks = requiredWeeks
@@ -277,32 +318,129 @@ export const useExpensesStore = defineStore('expenses', {
 		},
 
 		/**
-		 * Create a new expense
+		 * Apply an expense to the local list, calendar totals and day cache
+		 */
+		applyAdded(expense) {
+			this.allExpenses.push(expense)
+			const dateKey = localDateKey(expense.createdAt)
+			this.calendarTotals[dateKey] =
+				(this.calendarTotals[dateKey] || 0) + (expense.defaultCurrencyAmount || 0)
+			if (this.dayExpenses[dateKey]) {
+				this.dayExpenses[dateKey] = [...this.dayExpenses[dateKey], expense]
+			}
+		},
+
+		/**
+		 * Remove an expense from the local list, calendar totals and day cache
+		 */
+		applyRemoved(expense) {
+			this.allExpenses = this.allExpenses.filter((e) => e._id !== expense._id)
+			const dateKey = localDateKey(expense.createdAt)
+			this.calendarTotals[dateKey] =
+				(this.calendarTotals[dateKey] || 0) - (expense.defaultCurrencyAmount || 0)
+			if (this.dayExpenses[dateKey]) {
+				this.dayExpenses[dateKey] = this.dayExpenses[dateKey].filter(
+					(e) => e._id !== expense._id,
+				)
+			}
+		},
+
+		findExpense(id) {
+			return (
+				this.allExpenses.find((e) => e._id === id) ||
+				Object.values(this.dayExpenses)
+					.flat()
+					.find((e) => e._id === id)
+			)
+		},
+
+		/**
+		 * Keep an expense locally and send it when the connection is back
+		 */
+		queueExpense(data) {
+			const localId = `local-${generateId()}`
+			const category = useCategoriesStore().categories.find((c) => c._id === data.category)
+			this.pendingExpenses.push({ localId, data })
+			this.applyAdded({
+				...data,
+				_id: localId,
+				createdAt: new Date(data.createdAt || Date.now()).toISOString(),
+				category: category || data.category,
+				// Conversion happens on the server; only same-currency amounts can be counted now
+				defaultCurrency: this.defaultCurrency,
+				defaultCurrencyAmount: data.currency === this.defaultCurrency ? data.amount : 0,
+				pending: true,
+			})
+		},
+
+		/**
+		 * Create a new expense. Falls back to the offline queue on network failure.
 		 * @param {Object} expenseData
 		 */
 		async addExpense(expenseData) {
 			this.error = null
 			this.isAddingExpense = true
 			try {
-				const response = await axiosIns.post('/expense', expenseData)
-				this.allExpenses.push(response.data)
-
-				const dateKey = localDateKey(response.data.createdAt)
-				this.calendarTotals[dateKey] =
-					(this.calendarTotals[dateKey] || 0) + (response.data.defaultCurrencyAmount || 0)
-				if (this.dayExpenses[dateKey]) {
-					this.dayExpenses[dateKey] = [...this.dayExpenses[dateKey], response.data]
-				}
-
+				if (!navigator.onLine) throw new Error('offline')
+				const response = await axiosIns.post('/expense', expenseData, {
+					timeout: SYNC_TIMEOUT_MS,
+				})
+				this.applyAdded(response.data)
 				toast.success('Expense added successfully')
 				return response.data
 			} catch (err) {
+				if (isNetworkError(err)) {
+					this.queueExpense(expenseData)
+					toast.info("You're offline — expense saved and will sync automatically")
+					return null
+				}
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to add expense'
 				toast.error(this.error)
 				throw err
 			} finally {
 				this.isAddingExpense = false
+			}
+		},
+
+		/**
+		 * Send expenses created offline
+		 */
+		async syncPending() {
+			if (this.isSyncing || this.pendingExpenses.length === 0 || !navigator.onLine) return
+			this.isSyncing = true
+			let synced = 0
+			try {
+				for (const item of [...this.pendingExpenses]) {
+					const local = this.findExpense(item.localId)
+					try {
+						const response = await axiosIns.post('/expense', item.data, {
+							timeout: SYNC_TIMEOUT_MS,
+						})
+						this.pendingExpenses = this.pendingExpenses.filter(
+							(p) => p.localId !== item.localId,
+						)
+						if (local) this.applyRemoved(local)
+						this.applyAdded(response.data)
+						synced++
+					} catch (err) {
+						// Still offline: keep the rest of the queue for the next attempt
+						if (isNetworkError(err)) break
+						// Rejected by the server: drop it so it doesn't block the queue forever
+						this.pendingExpenses = this.pendingExpenses.filter(
+							(p) => p.localId !== item.localId,
+						)
+						if (local) this.applyRemoved(local)
+						toast.error(
+							`Couldn't sync "${item.data.title}": ${err.response?.data?.message || 'rejected by server'}`,
+						)
+					}
+				}
+				if (synced > 0) {
+					toast.success(`Synced ${synced} offline expense${synced > 1 ? 's' : ''}`)
+				}
+			} finally {
+				this.isSyncing = false
 			}
 		},
 
@@ -314,28 +452,11 @@ export const useExpensesStore = defineStore('expenses', {
 		async updateExpense(id, expenseData) {
 			this.error = null
 			try {
-				const oldExpense = this.allExpenses.find((e) => e._id === id)
+				const oldExpense = this.findExpense(id)
 				const response = await axiosIns.put(`/expense/${id}`, expenseData)
 				const updatedExpense = response.data
-				const index = this.allExpenses.findIndex((e) => e._id === id)
-				if (index !== -1) {
-					this.allExpenses[index] = updatedExpense
-				}
-
-				if (oldExpense) {
-					const oldKey = localDateKey(oldExpense.createdAt)
-					this.calendarTotals[oldKey] =
-						(this.calendarTotals[oldKey] || 0) - (oldExpense.defaultCurrencyAmount || 0)
-					if (this.dayExpenses[oldKey]) {
-						this.dayExpenses[oldKey] = this.dayExpenses[oldKey].filter((e) => e._id !== id)
-					}
-				}
-				const newKey = localDateKey(updatedExpense.createdAt)
-				this.calendarTotals[newKey] =
-					(this.calendarTotals[newKey] || 0) + (updatedExpense.defaultCurrencyAmount || 0)
-				if (this.dayExpenses[newKey]) {
-					this.dayExpenses[newKey] = [...this.dayExpenses[newKey], updatedExpense]
-				}
+				if (oldExpense) this.applyRemoved(oldExpense)
+				this.applyAdded(updatedExpense)
 
 				toast.success('Expense updated successfully')
 				return updatedExpense
@@ -353,9 +474,22 @@ export const useExpensesStore = defineStore('expenses', {
 				const response = await axiosIns.get('/expenses/totals', {
 					params: { startDate, endDate, tz: tzOffsetString() },
 				})
+				// Replace the whole range so days whose expenses were deleted elsewhere are cleared
+				const from = localDateKey(startDate)
+				const to = localDateKey(endDate)
+				const totals = Object.fromEntries(
+					Object.entries(this.calendarTotals).filter(([key]) => key < from || key > to),
+				)
 				response.data.forEach(({ date, total }) => {
-					this.calendarTotals[date] = total
+					totals[date] = total
 				})
+				this.allExpenses
+					.filter((e) => e.pending)
+					.forEach((e) => {
+						const key = localDateKey(e.createdAt)
+						totals[key] = (totals[key] || 0) + (e.defaultCurrencyAmount || 0)
+					})
+				this.calendarTotals = totals
 			} catch (err) {
 				console.error(err)
 				this.error = err.response?.data?.message || 'Failed to fetch calendar totals'
@@ -401,28 +535,26 @@ export const useExpensesStore = defineStore('expenses', {
 		},
 
 		/**
-		 * Delete an expense
+		 * Delete an expense (optimistically — restored if the request fails)
 		 * @param {string} id
 		 */
 		async deleteExpense(id) {
 			this.error = null
+			const expense = this.findExpense(id)
+			if (expense) this.applyRemoved(expense)
+
+			// Never reached the server: just drop it from the queue
+			if (this.pendingExpenses.some((p) => p.localId === id)) {
+				this.pendingExpenses = this.pendingExpenses.filter((p) => p.localId !== id)
+				return
+			}
+
 			try {
-				const expense = this.allExpenses.find((e) => e._id === id)
 				await axiosIns.delete(`/expense/${id}`)
-				this.allExpenses = this.allExpenses.filter((e) => e._id !== id)
-
-				if (expense) {
-					const dateKey = localDateKey(expense.createdAt)
-					this.calendarTotals[dateKey] =
-						(this.calendarTotals[dateKey] || 0) - (expense.defaultCurrencyAmount || 0)
-					if (this.dayExpenses[dateKey]) {
-						this.dayExpenses[dateKey] = this.dayExpenses[dateKey].filter((e) => e._id !== id)
-					}
-				}
-
 				toast.success('Expense deleted successfully')
 			} catch (err) {
 				console.error(err)
+				if (expense) this.applyAdded(expense)
 				this.error = err.response?.data?.message || 'Failed to delete expense'
 				toast.error(this.error)
 				throw err

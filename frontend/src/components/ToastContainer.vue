@@ -6,7 +6,7 @@ const { state, remove } = useToast()
 
 <template>
 	<div
-		class="fixed top-4 left-1/2 -translate-x-1/2 z-100 flex flex-col items-center gap-2 pointer-events-none w-full max-w-sm px-4"
+		class="fixed top-[calc(1rem+env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-100 flex flex-col items-center gap-2 pointer-events-none w-full max-w-sm px-4"
 	>
 		<TransitionGroup name="toast" tag="div" class="flex flex-col items-center gap-2 w-full">
 			<div

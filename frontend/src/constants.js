@@ -4,6 +4,7 @@ export const LS_KEYS = {
 	REFRESH_TOKEN: 'cn_refresh_token',
 	LAST_CURRENCY: 'lastUsedCurrency',
 	CATEGORIES: 'cn_categories',
+	EXPENSES_CACHE: 'cn_expenses_cache',
 }
 
 export const CURRENCIES = ['VND', 'LAK', 'USD', 'EUR', 'GBP', 'UAH', 'PLN', 'TRY', 'THB']

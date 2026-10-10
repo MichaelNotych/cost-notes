@@ -4,8 +4,7 @@ import { useExpensesStore } from '@/stores/expenses'
 import { useNumberFormat } from '@/composables/useNumberFormat'
 import DailyExpense from '@/components/DailyExpense.vue'
 import HeatmapCell from '@/components/HeatmapCell.vue'
-import AppButton from '@/components/atoms/AppButton.vue'
-import CloseIcon from '@/components/icons/CloseIcon.vue'
+import BottomSheet from '@/components/BottomSheet.vue'
 
 const expensesStore = useExpensesStore()
 const { fmtCompact, formatAmount } = useNumberFormat()
@@ -78,6 +77,10 @@ const monthsData = computed(() =>
 )
 
 const selectedDayKey = ref(null)
+const isDayOpen = ref(false)
+
+// Cached totals are shown immediately; the spinner is only for a cold start
+const hasCalendarData = computed(() => Object.keys(dayTotals.value).length > 0)
 
 const selectedDayExpenses = computed(() => {
 	if (!selectedDayKey.value) return []
@@ -105,6 +108,7 @@ const selectedDayLabel = computed(() => {
 const openDay = async (day) => {
 	if (!day || day.isFuture) return
 	selectedDayKey.value = day.key
+	isDayOpen.value = true
 	await expensesStore.fetchDayExpenses(day.key)
 }
 
@@ -178,7 +182,10 @@ onUnmounted(() => {
 		</div>
 
 		<!-- Initial loading -->
-		<div v-if="expensesStore.isLoadingCalendar" class="flex justify-center py-12">
+		<div
+			v-if="expensesStore.isLoadingCalendar && !hasCalendarData"
+			class="flex justify-center py-12"
+		>
 			<div
 				class="w-8 h-8 border-4 border-sky-600 border-t-transparent rounded-full animate-spin"
 			></div>
@@ -269,74 +276,34 @@ onUnmounted(() => {
 			</div>
 		</template>
 
-		<!-- Day detail popup -->
-		<Transition
-			enter-active-class="transition duration-200 ease-out"
-			enter-from-class="opacity-0"
-			enter-to-class="opacity-100"
-			leave-active-class="transition duration-150 ease-in"
-			leave-from-class="opacity-100"
-			leave-to-class="opacity-0"
-		>
-			<div
-				v-if="selectedDayKey"
-				class="fixed inset-x-0 top-0 bottom-0 z-60 flex items-end justify-center bg-zinc-950/70 backdrop-blur-sm"
-				@click.self="selectedDayKey = null"
-			>
-				<Transition
-					enter-active-class="transition duration-200 ease-out"
-					enter-from-class="translate-y-4 opacity-0"
-					enter-to-class="translate-y-0 opacity-100"
-					leave-active-class="transition duration-150 ease-in"
-					leave-from-class="translate-y-0 opacity-100"
-					leave-to-class="translate-y-4 opacity-0"
-				>
-					<div
-						v-if="selectedDayKey"
-						class="w-full max-w-lg bg-zinc-900 rounded-t-2xl border-t border-x border-none overflow-hidden"
-						@click.stop
-					>
-						<header
-							class="flex items-center justify-between px-4 py-3 border-b border-zinc-700"
-						>
-							<div>
-								<p class="font-semibold text-white text-sm">
-									{{ selectedDayLabel }}
-								</p>
-								<p class="text-xs text-sky-400 font-mono mt-0.5">
-									{{ formatAmount(selectedDayTotal) }}
-									{{ expensesStore.defaultCurrency }}
-								</p>
-							</div>
-							<AppButton
-								variant="secondary"
-								size="icon"
-								rounded="full"
-								@click="selectedDayKey = null"
-							>
-								<CloseIcon />
-							</AppButton>
-						</header>
+		<!-- Day detail sheet -->
+		<BottomSheet v-model="isDayOpen">
+			<template #header>
+				<div>
+					<p class="font-semibold text-white text-sm">{{ selectedDayLabel }}</p>
+					<p class="text-xs text-sky-400 font-mono mt-0.5">
+						{{ formatAmount(selectedDayTotal) }}
+						{{ expensesStore.defaultCurrency }}
+					</p>
+				</div>
+			</template>
 
-						<div class="overflow-y-auto max-h-72 px-2 py-1 pb-8">
-							<div v-if="isLoadingSelectedDay" class="flex justify-center py-6">
-								<div
-									class="w-5 h-5 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"
-								></div>
-							</div>
-							<template v-else-if="selectedDayExpenses.length > 0">
-								<DailyExpense
-									v-for="expense in selectedDayExpenses"
-									:key="expense._id"
-									:expense="expense"
-								/>
-							</template>
-							<p v-else class="text-center text-zinc-500 text-sm py-6">No expenses</p>
-						</div>
-					</div>
-				</Transition>
+			<div class="px-2 pt-1 pb-6">
+				<div v-if="isLoadingSelectedDay" class="flex justify-center py-6">
+					<div
+						class="w-5 h-5 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"
+					></div>
+				</div>
+				<div v-else-if="selectedDayExpenses.length > 0" class="divide-y divide-zinc-700/30">
+					<DailyExpense
+						v-for="expense in selectedDayExpenses"
+						:key="expense._id"
+						:expense="expense"
+					/>
+				</div>
+				<p v-else class="text-center text-zinc-500 text-sm py-6">No expenses</p>
 			</div>
-		</Transition>
+		</BottomSheet>
 	</div>
 </template>
 

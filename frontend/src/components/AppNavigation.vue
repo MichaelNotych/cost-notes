@@ -1,15 +1,12 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import CalendarIcon from './icons/CalendarIcon.vue'
 import HomeIcon from './icons/HomeIcon.vue'
 import SettingsIcon from './icons/SettingsIcon.vue'
 import PlusIcon from './icons/PlusIcon.vue'
 import ManualExpenseDialog from './ManualExpenseDialog.vue'
-import { useAuthStore } from '@/stores/auth'
 
 const dialog = ref(null)
-const authStore = useAuthStore()
-const showLabels = computed(() => authStore.user?.settings?.showNavLabels ?? false)
 
 const menu = [
 	{
@@ -32,24 +29,23 @@ const menu = [
 
 <template>
 	<nav
-		class="fixed bottom-4 left-4 right-4 z-40 flex justify-around items-center gap-4 px-6 py-4 bg-zinc-900/90 backdrop-blur-md rounded-3xl shadow-xl shadow-black/30"
+		class="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 right-4 max-w-2xl mx-auto z-40 flex justify-around items-center gap-4 px-6 py-4 bg-zinc-900/90 backdrop-blur-md rounded-3xl shadow-xl shadow-black/30"
 	>
 		<!-- First two nav items -->
 		<RouterLink
 			v-for="item in menu.slice(0, 2)"
 			:key="item.name"
 			:to="item.path"
-			class="p-1 flex gap-1 items-center justify-center flex-col opacity-60 flex-1"
+			class="p-1 flex gap-1 items-center justify-center flex-col opacity-60 flex-1 transition-transform active:scale-90"
 			activeClass="opacity-100"
 		>
 			<component :is="item.icon" v-if="item.icon" />
-			<span v-if="showLabels" class="text-xs">{{ item.name }}</span>
 		</RouterLink>
 
 		<!-- Center add button -->
 		<button
 			@click="dialog.open()"
-			class="flex items-center justify-center w-14 h-12 -my-1 rounded-2xl bg-sky-600 text-white shadow-md shadow-sky-500/40"
+			class="flex items-center justify-center w-14 h-12 -my-1 rounded-2xl bg-sky-600 text-white shadow-md shadow-sky-500/40 transition-transform active:scale-90"
 			aria-label="Add expense"
 		>
 			<PlusIcon size="6" />
@@ -60,11 +56,10 @@ const menu = [
 			v-for="item in menu.slice(2)"
 			:key="item.name"
 			:to="item.path"
-			class="p-1 flex gap-1 items-center justify-center flex-col opacity-60 flex-1"
+			class="p-1 flex gap-1 items-center justify-center flex-col opacity-60 flex-1 transition-transform active:scale-90"
 			activeClass="opacity-100"
 		>
 			<component :is="item.icon" v-if="item.icon" />
-			<span v-if="showLabels" class="text-xs">{{ item.name }}</span>
 		</RouterLink>
 	</nav>
 

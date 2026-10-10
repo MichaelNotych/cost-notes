@@ -13,6 +13,8 @@ import DailyExpense from './DailyExpense.vue'
 const expensesStore = useExpensesStore()
 const { formatAmount } = useNumberFormat()
 
+defineEmits(['edit-expense', 'add-manual-expense'])
+
 const props = defineProps({
 	date: {
 		type: String,
@@ -51,13 +53,9 @@ const dailyTotal = computed(() => {
 			</AppTitle>
 		</header>
 		<div>
-			<ul class="m-0 p-0 list-none">
-				<li
-					v-for="expense in expenses"
-					:key="expense._id"
-					@click="$emit('edit-expense', expense)"
-				>
-					<DailyExpense :expense="expense" />
+			<ul class="m-0 p-0 list-none divide-y divide-zinc-700/30">
+				<li v-for="expense in expenses" :key="expense._id">
+					<DailyExpense :expense="expense" @click="$emit('edit-expense', expense)" />
 				</li>
 			</ul>
 		</div>

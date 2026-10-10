@@ -20,20 +20,23 @@ watch(
 </script>
 
 <template>
-	<div class="px-4 pt-6 pb-50 max-w-2xl mx-auto w-full">
+	<!-- Opaque strip behind the translucent iOS status bar -->
+	<div
+		class="fixed inset-x-0 top-0 z-30 h-[env(safe-area-inset-top)] bg-zinc-800/90 backdrop-blur-md"
+	/>
+
+	<div
+		class="px-4 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(8rem+env(safe-area-inset-bottom))] max-w-2xl mx-auto w-full"
+	>
 		<main>
-			<RouterView />
+			<RouterView v-slot="{ Component }">
+				<!-- Tabs keep their state & data between switches; reset when the user changes -->
+				<KeepAlive :key="authStore.user?._id ?? 'guest'" exclude="AuthView">
+					<component :is="Component" />
+				</KeepAlive>
+			</RouterView>
 		</main>
 		<AppNavigation v-if="authStore.isAuthenticated" />
 		<ToastContainer />
 	</div>
 </template>
-
-<style>
-body {
-	background-color: var(--color-zinc-800);
-	color: var(--color-gray-300);
-	margin: 0;
-	padding: 0;
-}
-</style>

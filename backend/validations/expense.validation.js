@@ -16,6 +16,7 @@ const editExpenseSchema = {
     amount: Joi.number().optional(),
     currency: Joi.string().optional(),
     category: Joi.string().optional(),
+    createdAt: Joi.date().optional(),
   }),
 };
 
