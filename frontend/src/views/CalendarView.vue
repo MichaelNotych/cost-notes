@@ -65,12 +65,17 @@ const monthsData = computed(() =>
 			weeks.push({ days: weekDays, total: weekTotal })
 		}
 
+		// Current month averages over the days elapsed so far, not the whole month
+		const isCurrentMonth = today.getFullYear() === year && today.getMonth() === m
+		const elapsedDays = isCurrentMonth ? today.getDate() : daysInMonth
+
 		return {
 			name: new Date(year, m, 1).toLocaleDateString(undefined, {
 				month: 'long',
 				year: 'numeric',
 			}),
 			total: monthTotal,
+			dayAvg: monthTotal / elapsedDays,
 			weeks,
 		}
 	}),
@@ -261,9 +266,14 @@ onUnmounted(() => {
 						<h3 class="text-sm font-medium text-zinc-300 uppercase tracking-wide">
 							{{ month.name }}
 						</h3>
-						<span class="text-xs font-mono text-sky-500">
-							{{ month.total > 0 ? formatAmount(month.total) : '—' }}
-						</span>
+						<div class="flex items-baseline gap-2">
+							<span v-if="month.total > 0" class="text-xs font-mono text-zinc-500">
+								{{ formatAmount(month.dayAvg) }}/day
+							</span>
+							<span class="text-xs font-mono text-sky-500">
+								{{ month.total > 0 ? formatAmount(month.total) : '—' }}
+							</span>
+						</div>
 					</div>
 
 					<!-- Day-of-week labels -->
